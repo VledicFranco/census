@@ -2,8 +2,8 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.index
-
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET /             controllers.InRequests.index
+GET /control      controllers.InRequests.getControl
+POST /control     controllers.InRequests.postControl
+POST /graph       controllers.InRequests.postGraph
+POST /compute     controllers.InRequests.postCompute

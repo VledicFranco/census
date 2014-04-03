@@ -16,10 +16,10 @@ import play.api.libs.concurrent.Execution.Implicits._
 trait WebService {
   
   /** Port where the web service is listening. */
-  var port: Int = 80
+  var port: Int = 0
 
   /** Host name where the web service is located. */
-  var host: String = "localhost"
+  var host: String = ""
 
   /** User for authenticating requests. */
   var user: String = "root"

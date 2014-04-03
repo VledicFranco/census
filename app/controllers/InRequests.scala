@@ -19,17 +19,17 @@ object InRequests extends Controller {
   
   /** Route: GET / */ 
   def index = Action {
-    Ok("Hello, I am Census 2 Engine, how can I serve you?")
+    Ok("Hello, I am Census 2 Control, how can I serve you?")
   }
 
-  /** Route: POST /control */ 
-  def postControl = Action(parse.json) { implicit request =>
-    val r = SetCensusControlRequest(request.body)
+  /** Route: POST /hook */ 
+  def postHTTPHook = Action(parse.json) { implicit request =>
+    val r = SetHTTPHookRequest(request.body)
     if (r.errors.length > 0)
       BadRequest(r.errorsToJson)
     else {
       Async {
-        OutRequests.ping map {
+        HTTPHook.ping map {
           response => Ok(Json.obj("status" -> "success"))
         } recover {
           case _ => InternalServerError(Json.obj("status" -> "unreachable host"))
@@ -38,23 +38,12 @@ object InRequests extends Controller {
     }
   }
 
-  /** Route: GET /control */ 
-  def getControl = Action {
+  /** Route: GET /hook */ 
+  def getHTTPHook = Action {
     Ok(Json.obj(
-      "host" -> OutRequests.host,
-      "port" -> OutRequests.port
+      "host" -> HTTPHook.host,
+      "port" -> HTTPHook.port
     ))
-  }
-
-  /** Route: POST /graph */ 
-  def postGraph = Action(parse.json) { implicit request =>
-    val r = GraphImportRequest(request.body)
-    if (r.errors.length > 0)
-      BadRequest(r.errorsToJson)
-    else {
-      RequestsQueue.enqueue(r)
-      Ok(Json.obj("status" -> "acknowledged"))
-    }
   }
 
   /** Route: POST /compute */ 
@@ -63,9 +52,12 @@ object InRequests extends Controller {
     if (r.errors.length > 0)
       BadRequest(r.errorsToJson)
     else {
-      RequestsQueue.enqueue(r)
-      Ok(Json.obj("status" -> "acknowledged"))
+//      RequestsQueue.enqueue(r)
+      Ok(Json.obj(
+        "status" -> "acknowledged",
+        "token" -> r.token
+      ))
     }
   }
-
+  
 }

@@ -16,9 +16,11 @@ object Closeness {
 }
 
 class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
+
   this.requester = r
   
   def enqueue: Unit = {
     println("HOLA :)")
   }
+
 }

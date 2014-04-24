@@ -4,6 +4,8 @@
 
 package compute
 
+import requests.ComputationRequest 
+
 /**
  * All the implemented graph algorithms must be registered in
  * this module for requests references.
@@ -17,9 +19,9 @@ object Library {
    * @return the object module of the corresponding algorithm.
    *         'None' if there was no matching algorithm.
    */
-  def apply (algorithm: String): Option[String] = {
+  def apply (algorithm: String, request: ComputationRequest): Option[EngineAlgorithm] = {
     algorithm match {
-      case "Closeness" => Some("Closeness")
+      case "Closeness" => Some(Closeness(request))
       // Here add more cases for more algorithms.
       case _ => None
     }

@@ -12,6 +12,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import controllers.HTTPHook
 import controllers.N4j
 import compute.Library
+import compute.EngineAlgorithm
 
 /**
  * Companion object to correctly build the request.
@@ -46,7 +47,7 @@ class ComputationRequest (json: JsValue) extends Request {
   var token: String = null
 
   /** Algorithm to be executed. */
-  var algorithm: String  = null
+  var algorithm: EngineAlgorithm = null
 
   /** Moment when the request was created. */
   var creationTime: Long = 0
@@ -71,7 +72,7 @@ class ComputationRequest (json: JsValue) extends Request {
     token = Utils.genUUID
     (json \ "algorithm").asOpt[String] match {
       case None => errors = errors :+ "'algorithm' field missing."
-      case Some(data) => Library(data) match {
+      case Some(data) => Library(data, this) match {
         case None => errors = errors :+ s"No such algorithm '$data'"
         case Some(algo) => algorithm = algo
       }
@@ -107,9 +108,7 @@ class ComputationRequest (json: JsValue) extends Request {
     N4j.setAuth(n4juser, n4jpassword)
     // Check for server connectivity.
     N4j.ping map { response => 
-
-// ADD COMPUTATION TO QUEUE HERE
-
+      algorithm.enqueue
     } recover {
       case _ => 
         // Report: Neo4j server unreachable.

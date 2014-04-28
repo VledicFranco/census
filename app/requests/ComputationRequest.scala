@@ -104,10 +104,13 @@ class ComputationRequest (json: JsValue) extends Request {
    */
   def execute: Unit = {
     if (errors.length > 0) return
-    N4j.setHost(n4jhost, n4jport)
-    N4j.setAuth(n4juser, n4jpassword)
+    val database = new N4j
+    database.tag = tag
+    database.setHost(n4jhost, n4jport)
+    database.setAuth(n4juser, n4jpassword)
+    algorithm.database = database
     // Check for server connectivity.
-    N4j.ping map { response => 
+    database.ping map { response => 
       algorithm.enqueue
     } recover {
       case _ => 

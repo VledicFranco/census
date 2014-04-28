@@ -37,10 +37,10 @@ object HTTPHook extends WebService {
    */
   object Error {
     
-//    def invalidN4jFormat (request: GraphImportRequest): Unit = {
-//      println("Invalid Neo4j format.") 
-//    }
-//
+    def invalidN4jFormat (request: ComputationRequest): Unit = {
+      println("Invalid Neo4j format.") 
+    }
+
     def unreachableN4j (request: ComputationRequest): Unit = {
       if (isActive)
         println("Unreachable Neo4j server.")

@@ -11,7 +11,9 @@ import play.api.libs.concurrent.Execution.Implicits._
 /**
  * Module that handles the Neo4j http queries.
  */
-object N4j extends WebService {
+class N4j extends WebService {
+
+  var tag: String = null
 
   /**
    * Queries through http to the registered Neo4j

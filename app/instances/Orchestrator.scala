@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package controllers
+package instances
 
 import scala.concurrent._
 import scala.collection.mutable.Queue
@@ -15,13 +15,15 @@ import compute.EngineAlgorithm
  * Module that enqueues requests, processed as first
  * come first served.
  */
-object RequestsQueue {
+object Orchestrator {
 
   /** Used to know if the requests are being processed. */
   var isRunning = false
 
   /** Queue for the requests. */
   var queue: Queue[EngineAlgorithm] = Queue()
+
+  var pool: Array[Instance] = null
 
   /**
    * Adds a request to the queue and starts the

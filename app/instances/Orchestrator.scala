@@ -25,6 +25,20 @@ object Orchestrator {
 
   var pool: Array[Instance] = null
 
+  def createInstances: Unit = {
+    val instance = new Instance("localhost", 9000)
+    instance.post("/control", "{"
+      + """ "host": "localhost", """
+      + """ "port": 9001 """
+      + "}"
+    ) map {
+      res => println(res.json)
+    } recover {
+      case _ => println("error :(")
+    }
+    pool = Array[Instance] (instance)
+  }
+
   /**
    * Adds a request to the queue and starts the
    * processing if the queue is idle.
@@ -49,18 +63,29 @@ object Orchestrator {
    * himself as a callback of the request so that 
    * the queue continues after the request is done.
    */
-  private def next (): Unit = {
+  def next: Unit = {
     // Terminate if there is no next request.
     if (queue.isEmpty) {
       isRunning = false
       return
     }
-    // Retrieve next request.
-    val req: EngineAlgorithm = queue.dequeue
-    // Call execution procedure of the request.
 
-    // Check for the InstancesPool status.
-    // Enqueue request to the apropiate instance.
+    var foundFreeInstance = false
+
+    for (instance: Instance <- pool) {
+      if (instance.hasFreeSpace) {
+        foundFreeInstance = true
+        instance.enqueue(queue.dequeue)
+      }
+    }
+
+    // If instances are full and still less than the allowed max
+    // create a new instance and start using it.
+    
+    // Continue untill instances are full.
+    // The queue is restarted when the requests in the instances
+    // are finished.
+    if (foundFreeInstance) next
   }
 
 }

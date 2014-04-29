@@ -89,7 +89,7 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
         // Create SSCloseness request and enqueue.
         val sscloseness = SSCloseness(source(0), r)
         sscloseness.token = Utils.genUUID
-        sscloseness.parentToken = token
+        sscloseness.parentEngineAlgorithm = this  
         sscloseness.database = database
         sscloseness.enqueue
       }

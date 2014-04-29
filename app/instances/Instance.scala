@@ -14,7 +14,7 @@ import compute.EngineAlgorithm
 
 class Instance (val h: String, val p: Int) extends WebService {
 
-  this.setHost(host, port)
+  this.setHost(h, p)
   
   var activeGraphHost: N4j = null
 

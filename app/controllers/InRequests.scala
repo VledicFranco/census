@@ -11,6 +11,8 @@ import play.api.libs.concurrent.Execution.Implicits._
 
 import requests._
 
+import instances.Orchestrator
+
 /**
  * Module that handles the Play Framework http
  * requests.
@@ -19,6 +21,7 @@ object InRequests extends Controller {
   
   /** Route: GET / */ 
   def index = Action {
+    Orchestrator.createInstances
     Ok("Hello, I am Census 2 Control, how can I serve you?")
   }
 

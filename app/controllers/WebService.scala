@@ -61,7 +61,9 @@ trait WebService {
    * @return a future that handles the web service response.
    */
   def post (path: String, data: String): Future[Response] = {
-    WS.url(s"http://$host:$port$path").post(data)
+    WS.url(s"http://$host:$port$path")
+      .withHeaders("Content-Type" -> "application/json")
+      .post(data)
   }
 
   /**

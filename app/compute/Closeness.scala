@@ -8,6 +8,7 @@ import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import instances.Orchestrator
+import requests.Utils
 import requests.ComputationRequest
 import controllers.N4j
 import controllers.HTTPHook
@@ -23,7 +24,8 @@ object Closeness {
 
 class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
 
-  this.requester = r
+  requester = r
+  token = requester.token
   
   def enqueue: Unit = {
     batch
@@ -85,6 +87,8 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
       for (source: Array[String] <- data) {
         // Create SSCloseness request and enqueue.
         val sscloseness = SSCloseness(source(0), r)
+        sscloseness.token = Utils.genUUID
+        sscloseness.parentToken = token
         sscloseness.database = database
         sscloseness.enqueue
       }

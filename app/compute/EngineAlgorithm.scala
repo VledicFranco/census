@@ -11,6 +11,8 @@ trait EngineAlgorithm {
   
   var status: String = "pending"
 
+  var token: String = null
+
   var database: N4j = null
 
   var requester: ComputationRequest = null

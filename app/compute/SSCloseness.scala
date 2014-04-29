@@ -19,7 +19,9 @@ object SSCloseness {
 
 class SSCloseness (val source: String, val r: ComputationRequest) extends EngineAlgorithm {
 
-  this.requester = r
+  requester = r
+
+  var parentToken: String = null
 
   def enqueue: Unit = {
     println(source)

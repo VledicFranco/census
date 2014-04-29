@@ -7,11 +7,12 @@ package compute
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import instances.Orchestrator
 import requests.Utils
 import requests.ComputationRequest
 import controllers.N4j
 import controllers.HTTPHook
+import instances.Orchestrator
+import instances.Instance
 
 object Closeness {
 
@@ -98,4 +99,6 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
     }
   }
   
+  def sendRequest (instance: Instance): Unit = {}
+
 }

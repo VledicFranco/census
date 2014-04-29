@@ -6,12 +6,15 @@ package compute
 
 import requests.ComputationRequest
 import controllers.N4j
+import instances.Instance
 
 trait EngineAlgorithm {
   
   var status: String = "pending"
 
   var token: String = null
+
+  val creationTime: Long = System.currentTimeMillis
 
   var database: N4j = null
 
@@ -20,5 +23,7 @@ trait EngineAlgorithm {
   var requestData: String = null
   
   def enqueue: Unit
+
+  def sendRequest (instance: Instance): Unit
 
 }

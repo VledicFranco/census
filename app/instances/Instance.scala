@@ -39,8 +39,23 @@ class Instance (val h: String, val p: Int) extends WebService {
     return false
   }
 
-  //def enqueue 
+  def enqueue (engineAlgo: EngineAlgorithm): Unit = {
+    for (i <- 0 to conf.ce_max_queue_size) {
+      // Found a free spot.
+      if (queue(i) == null) {
+        queue(i) = engineAlgo 
+        engineAlgo.sendRequest(this)
+      }
+    }
+  }
 
-  //def finishedEngineAlgorithmRequest
+  def finishedEngineAlgorithmRequest (token: String): Unit = {
+    for (i <- 0 to conf.ce_max_queue_size) {
+      if (queue(i) != null && queue(i).token == token) {
+        queue(i).computationComplete
+        queue(i) = null
+      }
+    }
+  }
 
 }

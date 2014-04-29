@@ -56,4 +56,8 @@ class SSCloseness (val source: String, val r: ComputationRequest) extends Engine
     }
   }
 
+  def computationComplete: Unit = {
+    println(s"Finished for source $source")
+  }
+
 }

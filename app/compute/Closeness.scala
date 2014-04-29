@@ -101,4 +101,6 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
   
   def sendRequest (instance: Instance): Unit = {}
 
+  def computationComplete: Unit = {}
+
 }

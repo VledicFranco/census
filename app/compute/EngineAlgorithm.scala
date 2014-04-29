@@ -26,4 +26,6 @@ trait EngineAlgorithm {
 
   def sendRequest (instance: Instance): Unit
 
+  def computationComplete: Unit
+
 }

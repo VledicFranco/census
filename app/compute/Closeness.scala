@@ -7,7 +7,6 @@ package compute
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import requests.Utils
 import requests.ComputationRequest
 import controllers.N4j
 import controllers.HTTPHook
@@ -88,7 +87,6 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
       for (source: Array[String] <- data) {
         // Create SSCloseness request and enqueue.
         val sscloseness = SSCloseness(source(0), r)
-        sscloseness.token = Utils.genUUID
         sscloseness.parentEngineAlgorithm = this  
         sscloseness.database = database
         sscloseness.enqueue

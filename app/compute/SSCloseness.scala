@@ -4,6 +4,8 @@
 
 package compute
 
+import com.github.nscala_time.time.Imports._ 
+
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
@@ -28,21 +30,23 @@ class SSCloseness (val source: String, val r: ComputationRequest) extends Engine
   var parentEngineAlgorithm: EngineAlgorithm = null
 
   def enqueue: Unit = {
-    println(source)
+    Orchestrator.enqueue(this)
   }
 
   def sendRequest (instance: Instance): Unit = {
     instance.post("/compute", "{"
       +s""" "token": "$token", """
       + """ "algorithm": "SSCloseness", """
-      +s""" "creationTime": "$creationTime", """
-      +s""" "vars": { "source": $source } """
+      +s""" "creationTime": $creationTime, """
+      +s""" "vars": { "source": "$source" } """
       + "}"
     ) map {
       res => validateJson(res.json)
     } recover {
       // Handle instance failure here.
-      case _ => println("Unreachable instance.")
+      case _ => {
+        println(s"${DateTime.now} - ERROR: Couldn't reach instance with host ${instance.host}:${instance.port}.")
+      }
     }
   }
 
@@ -51,13 +55,16 @@ class SSCloseness (val source: String, val r: ComputationRequest) extends Engine
       case Some(resStatus) =>
         if (resStatus == "acknowledged") {
           status = "computing"
+        } else {
+          println(s"${DateTime.now} - ERROR: Census Engine response status:$resStatus please check for bugs.")
         }
-      case None => println("Invalid Census Engine response, please check for bugs.")
+      case None => println(s"${DateTime.now} - ERROR: Invalid Census Engine response, please check for bugs.")
     }
   }
 
   def computationComplete: Unit = {
-    println(s"Finished for source $source")
+    status = "finished"
+    // Collect to the parent request.
   }
 
 }

@@ -5,4 +5,4 @@ curl -X POST -H "Content-Type: application/json" -d '{
     "host": "localhost",
     "port": 7474
   }
-}' http://localhost:9000/compute
+}' http://localhost:9595/compute

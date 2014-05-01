@@ -24,36 +24,31 @@ class Instance (val h: String, val p: Int) extends WebService {
   var queue: Array[EngineAlgorithm] = new Array[EngineAlgorithm](conf.ce_max_queue_size)
 
   def hasFreeSpace: Boolean = {
-    for (algo: EngineAlgorithm <- queue) {
-      if (algo == null)
-        return true
-    }
-    return false
-  }
-
-  def hasEngineAlgorithmRequest (token: String): Boolean = {
-    for (algo: EngineAlgorithm <- queue) {
-      if (algo != null && algo.token == token)
+    for (i <- 0 to conf.ce_max_queue_size-1) {
+      if (queue(i) == null)
         return true
     }
     return false
   }
 
   def enqueue (engineAlgo: EngineAlgorithm): Unit = {
-    for (i <- 0 to conf.ce_max_queue_size) {
-      // Found a free spot.
+    for (i <- 0 to conf.ce_max_queue_size-1) {
       if (queue(i) == null) {
         queue(i) = engineAlgo 
+        // Enqueue correct graph first.
+        // Enqueue computation.
         engineAlgo.sendRequest(this)
+        return
       }
     }
   }
 
-  def finishedEngineAlgorithmRequest (token: String): Unit = {
-    for (i <- 0 to conf.ce_max_queue_size) {
+  def finished (token: String): Unit = {
+    for (i <- 0 to conf.ce_max_queue_size-1) {
       if (queue(i) != null && queue(i).token == token) {
         queue(i).computationComplete
         queue(i) = null
+        return
       }
     }
   }

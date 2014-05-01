@@ -4,6 +4,7 @@
 
 package compute
 
+import requests.Utils
 import requests.ComputationRequest
 import controllers.N4j
 import instances.Instance
@@ -12,7 +13,7 @@ trait EngineAlgorithm {
   
   var status: String = "pending"
 
-  var token: String = null
+  var token: String = Utils.genUUID
 
   val creationTime: Long = System.currentTimeMillis
 

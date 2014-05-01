@@ -21,7 +21,6 @@ object InRequests extends Controller {
   
   /** Route: GET / */ 
   def index = Action {
-    Orchestrator.createInstances
     Ok("Hello, I am Census 2 Control, how can I serve you?")
   }
 

@@ -7,4 +7,8 @@ GET  /hook         controllers.InRequests.getHTTPHook
 POST /hook         controllers.InRequests.postHTTPHook
 POST /compute      controllers.InRequests.postCompute
 
+GET  /test         controllers.InReports.test
+POST /censusengine/report controllers.InReports.report
+POST /censusengine/error  controllers.InReports.error
+
 GET  /assets/*file controllers.Assets.at(path="/public", file)

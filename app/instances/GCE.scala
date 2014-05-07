@@ -21,7 +21,10 @@ object GCE extends WebService {
   private var token_expiration: Long = 0
 
   private def getAccessToken (callback: String=>Unit): Unit = {
-    if (access_token != null && System.currentTimeMillis < token_expiration) return callback(access_token)
+    if (access_token != null && System.currentTimeMillis < token_expiration) {
+      callback(access_token)
+      return
+    }
     WS.url(s"http://metadata/computeMetadata/v1/instance/service-accounts/default/token")
       .withHeaders("X-Google-Metadata-Request" -> "True")
       .get map { response => 
@@ -29,7 +32,7 @@ object GCE extends WebService {
           case Some(token) => access_token = token
           case None => println(s"${DateTime.now} - ERROR: Json from Google metadata service is invalid, please check for bugs.")
         }
-        (response.json \ "expires_in").asOpt[String] match {
+        (response.json \ "expires_in").asOpt[Long] match {
           case Some(expiration) => token_expiration = expiration + System.currentTimeMillis - 1000
           case None => println(s"${DateTime.now} - ERROR: Json from Google metadata service is invalid, please check for bugs.")
         }

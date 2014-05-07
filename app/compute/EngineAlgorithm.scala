@@ -17,8 +17,6 @@ trait EngineAlgorithm {
 
   val creationTime: Long = System.currentTimeMillis
 
-  var database: N4j = null
-
   var requester: ComputationRequest = null
 
   var requestData: String = null
@@ -26,6 +24,8 @@ trait EngineAlgorithm {
   def enqueue: Unit
 
   def sendRequest (instance: Instance): Unit
+
+  def sendImportGraphRequest (instance: Instance): Unit
 
   def computationComplete: Unit
 

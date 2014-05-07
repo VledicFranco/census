@@ -35,8 +35,8 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
    * Queries Neo4j for a batch of 1000 vertices ids.
    */
   private def batch: Unit = {
-    database.query(
-      s"MATCH (n:${database.tag}) "
+    requester.database.query(
+      s"MATCH (n:${requester.database.tag}) "
       + "WHERE not(has(n.censuscheck)) "
       + "WITH n LIMIT 1000 "
       + "SET n.censuscheck = true "
@@ -62,7 +62,7 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
         // Keep importing arrays until an empty one is received.
         if (importArray(data)) batch
         // Clear database from censusimport attributes.
-        else database.query(s"MATCH (n:${database.tag} {censuscheck:true}) REMOVE n.censuscheck") recover {
+        else requester.database.query(s"MATCH (n:${requester.database.tag} {censuscheck:true}) REMOVE n.censuscheck") recover {
           // Report: Neo4j server unreachable.
           case _ => HTTPHook.Error.unreachableN4j(r)
         }
@@ -88,7 +88,6 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
         // Create SSCloseness request and enqueue.
         val sscloseness = SSCloseness(source(0), r)
         sscloseness.parentEngineAlgorithm = this  
-        sscloseness.database = database
         sscloseness.enqueue
       }
       return true
@@ -98,6 +97,8 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
   }
   
   def sendRequest (instance: Instance): Unit = {}
+
+  def sendImportGraphRequest (instance: Instance): Unit = {}
 
   def computationComplete: Unit = {}
 

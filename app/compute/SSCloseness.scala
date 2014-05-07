@@ -62,6 +62,8 @@ class SSCloseness (val source: String, val r: ComputationRequest) extends Engine
     }
   }
 
+  def sendImportGraphRequest (instance: Instance): Unit = {}
+
   def computationComplete: Unit = {
     status = "finished"
     // Collect to the parent request.

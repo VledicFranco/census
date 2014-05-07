@@ -57,7 +57,7 @@ object InRequests extends Controller {
 //      RequestsQueue.enqueue(r)
       Ok(Json.obj(
         "status" -> "acknowledged",
-        "token" -> r.token
+        "token" -> r.algorithm.token
       ))
     }
   }

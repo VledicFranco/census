@@ -15,17 +15,16 @@ import instances.Instance
 
 object Closeness {
 
-  def apply (r: ComputationRequest): Closeness = {
-    val algo = new Closeness(r)
+  def apply (requester: ComputationRequest): Closeness = {
+    val algo = new Closeness(requester)
     algo
   }
 
 }
 
-class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
+class Closeness (val requester: ComputationRequest) extends EngineAlgorithm {
 
-  requester = r
-  token = requester.token
+  val name = "Closeness"
   
   def enqueue: Unit = {
     batch
@@ -45,7 +44,7 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
       res => validateJson(res.json)
     } recover {
       // Report: Neo4j server unreachable.
-      case _ => HTTPHook.Error.unreachableN4j(r)
+      case _ => HTTPHook.Error.unreachableN4j(requester)
     }
   }
 
@@ -64,12 +63,12 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
         // Clear database from censusimport attributes.
         else requester.database.query(s"MATCH (n:${requester.database.tag} {censuscheck:true}) REMOVE n.censuscheck") recover {
           // Report: Neo4j server unreachable.
-          case _ => HTTPHook.Error.unreachableN4j(r)
+          case _ => HTTPHook.Error.unreachableN4j(requester)
         }
         // FINISHED
       case None => 
         // Report: Invalid Neo4j graph format.
-        HTTPHook.Error.invalidN4jFormat(r)
+        HTTPHook.Error.invalidN4jFormat(requester)
     }
   }
 
@@ -86,7 +85,7 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
     if (!data.isEmpty) {
       for (source: Array[String] <- data) {
         // Create SSCloseness request and enqueue.
-        val sscloseness = SSCloseness(source(0), r)
+        val sscloseness = SSCloseness(source(0), requester)
         sscloseness.parentEngineAlgorithm = this  
         sscloseness.enqueue
       }
@@ -96,9 +95,7 @@ class Closeness (val r: ComputationRequest) extends EngineAlgorithm {
     }
   }
   
-  def sendRequest (instance: Instance): Unit = {}
-
-  def sendImportGraphRequest (instance: Instance): Unit = {}
+  def sendComputationRequest (instance: Instance): Unit = {}
 
   def computationComplete: Unit = {}
 

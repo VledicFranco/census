@@ -23,9 +23,9 @@ object SSCloseness {
 
 }
 
-class SSCloseness (val source: String, val r: ComputationRequest) extends EngineAlgorithm {
+class SSCloseness (val source: String, val requester: ComputationRequest) extends EngineAlgorithm {
 
-  requester = r
+  val name = "SSCloseness"
 
   var parentEngineAlgorithm: EngineAlgorithm = null
 
@@ -33,7 +33,7 @@ class SSCloseness (val source: String, val r: ComputationRequest) extends Engine
     Orchestrator.enqueue(this)
   }
 
-  def sendRequest (instance: Instance): Unit = {
+  def sendComputationRequest (instance: Instance): Unit = {
     instance.post("/compute", "{"
       +s""" "token": "$token", """
       + """ "algorithm": "SSCloseness", """
@@ -41,7 +41,7 @@ class SSCloseness (val source: String, val r: ComputationRequest) extends Engine
       +s""" "vars": { "source": "$source" } """
       + "}"
     ) map {
-      res => validateJson(res.json)
+      res => validateRequest(res.json)
     } recover {
       // Handle instance failure here.
       case _ => {
@@ -50,7 +50,7 @@ class SSCloseness (val source: String, val r: ComputationRequest) extends Engine
     }
   }
 
-  def validateJson (json: JsValue): Unit = {
+  def validateRequest (json: JsValue): Unit = {
     (json \ "status").asOpt[String] match {
       case Some(resStatus) =>
         if (resStatus == "acknowledged") {
@@ -61,8 +61,6 @@ class SSCloseness (val source: String, val r: ComputationRequest) extends Engine
       case None => println(s"${DateTime.now} - ERROR: Invalid Census Engine response, please check for bugs.")
     }
   }
-
-  def sendImportGraphRequest (instance: Instance): Unit = {}
 
   def computationComplete: Unit = {
     status = "finished"

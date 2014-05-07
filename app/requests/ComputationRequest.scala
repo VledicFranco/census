@@ -43,9 +43,6 @@ object ComputationRequest {
  */
 class ComputationRequest (json: JsValue) extends Request {
 
-  /** Token to identify the request. */
-  var token: String = null
-
   /** Algorithm to be executed. */
   var algorithm: EngineAlgorithm = null
 
@@ -71,7 +68,6 @@ class ComputationRequest (json: JsValue) extends Request {
    * Json validation.
    */
   override def validate: Unit = {
-    token = Utils.genUUID
     (json \ "algorithm").asOpt[String] match {
       case None => errors = errors :+ "'algorithm' field missing."
       case Some(data) => Library(data, this) match {

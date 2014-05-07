@@ -21,8 +21,6 @@ object Orchestrator {
 
   /** Used to know if the requests are being processed. */
   var isRunning: Boolean = false
-  
-  var isCreatingFirstInstance: Boolean = false
 
   /** Queue for the requests. */
   var queue: Queue[EngineAlgorithm] = Queue()
@@ -44,10 +42,7 @@ object Orchestrator {
     if (isRunning) return
     isRunning = true
 
-    waitForFirstInstance
-
     if (poolIsEmpty) {
-      isCreatingFirstInstance = true
       createInstance(next)
     } else {
       future { next }
@@ -101,22 +96,12 @@ object Orchestrator {
     return true
   }
 
-  private def waitForFirstInstance: Unit = {
-    if (!isCreatingFirstInstance) return
-    println("Will wait for first instance.")
-    Thread.sleep(500)
-    waitForFirstInstance
-  }
-
   /**
    * Executes the next request in the queue, passes 
    * himself as a callback of the request so that 
    * the queue continues after the request is done.
    */
   private def next (): Unit = {
-    if (isCreatingFirstInstance)
-      isCreatingFirstInstance = false
-
     // Terminate if there is no next request.
     if (queue.isEmpty) {
       isRunning = false

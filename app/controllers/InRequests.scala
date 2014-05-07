@@ -12,6 +12,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import requests._
 
 import instances.Orchestrator
+import instances.GCE
 
 /**
  * Module that handles the Play Framework http
@@ -22,6 +23,12 @@ object InRequests extends Controller {
   /** Route: GET / */ 
   def index = Action {
     Ok("Hello, I am Census 2 Control, how can I serve you?")
+  }
+
+  /** Route: GET /test */
+  def test = Action {
+    GCE.verifyToken
+    Ok("Test init.")
   }
 
   /** Route: POST /hook */ 

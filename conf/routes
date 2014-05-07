@@ -3,6 +3,7 @@
 # ~~~~
 
 GET  /             controllers.InRequests.index
+GET  /test         controllers.InRequests.test
 GET  /hook         controllers.InRequests.getHTTPHook
 POST /hook         controllers.InRequests.postHTTPHook
 POST /compute      controllers.InRequests.postCompute

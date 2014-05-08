@@ -1,14 +1,20 @@
-# Create root persistent disk.
-gcutil adddisk census-control-disk --size_gb=10 --zone=us-central1-a --source_image=debian-7
+# Create root persistent disks.
+gcutil adddisk census-<control | engine>-disk --size_gb=10 --zone=us-central1-a --source_image=debian-7
 
-# Create needed networks and firewalls.
+# Create needed networks and firewalls for Census Control.
 gcutil addnetwork census-control
 gcutil addfirewall census-control-default --network=census-control --allowed="tcp:9595"
 gcutil addfirewall census-control-ssh --network=census-control --allowed="tcp:22"
 gcutil addfirewall census-control-allow-internal --network=census-control --allowed_ip_sources=10.0.0.0/8 --allowed="tcp:1-65535,udp:1-65535,icmp"
 
-# Create gce instance.
+# Create gce instance for Census Control.
 gcutil addinstance census-control --disk=census-control-disk,boot --service_account_scope=compute-rw --network=census-control --zone=us-central1-a --machine_type=n1-highcpu-2
+
+# Create testing gce instance for Census Engine.
+gcutil addinstance census-engine-test --disk=census-engine-disk,boot --service_account_scope=storage-ro --network=default --zone=us-central1-a --machine_type=n1-highcpu-2 --metadata=startup-script-url:gs://census-framework/engine-startup.sh
+
+# Get logs from instance.
+gcutil getserialportoutput <instance>
 
 # Script for census-control instance instalation.
 sudo -s

@@ -8,6 +8,7 @@ import scala.concurrent._
 
 import com.github.nscala_time.time.Imports._ 
 
+import play.api.libs.ws._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import controllers.N4j
@@ -26,7 +27,7 @@ class Instance (val h: String, val p: Int) extends WebService {
   var queue: Array[EngineAlgorithm] = new Array[EngineAlgorithm](conf.ce_max_queue_size)
 
   def initialize (callback: Instance=>Unit): Unit = {
-    ping map { response =>
+    WS.url(s"$host:$port").withTimeout(1000).head map { response =>
       post("/control", "{"
         +s""" "host": "${conf.census_control_host}", """
         +s""" "port": ${conf.census_control_port} """

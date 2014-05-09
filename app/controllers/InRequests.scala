@@ -12,6 +12,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import requests._
 
 import instances.Orchestrator
+import instances.Instance
 import instances.GCE
 
 /**
@@ -27,7 +28,18 @@ object InRequests extends Controller {
 
   /** Route: GET /test */
   def test = Action {
-    GCE.verifyToken
+    //GCE.verifyToken
+//    val json = Json.obj(
+//      "arr" -> Json.arr(Json.obj(
+//        "some" -> "value"
+//      ))
+//    )
+//    for (a <- (json \ "arr" \\ "some")) {
+//      println(a.as[String])
+//    }
+    GCE.createInstance { instance =>
+      println(s"WOOT!! :: ${instance.host}")
+    }
     Ok("Test init.")
   }
 

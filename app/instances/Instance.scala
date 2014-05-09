@@ -6,6 +6,8 @@ package instances
 
 import scala.concurrent._
 
+import com.github.nscala_time.time.Imports._ 
+
 import play.api.libs.concurrent.Execution.Implicits._
 
 import controllers.N4j
@@ -22,6 +24,25 @@ class Instance (val h: String, val p: Int) extends WebService {
 
   /** Queue for the requests. */
   var queue: Array[EngineAlgorithm] = new Array[EngineAlgorithm](conf.ce_max_queue_size)
+
+  def initialize (callback: Instance=>Unit): Unit = {
+    ping map { response =>
+      post("/control", "{"
+        +s""" "host": "${conf.census_control_host}", """
+        +s""" "port": ${conf.census_control_port} """
+        + "}"
+      ) map { res => 
+        callback(this)
+      } recover {
+        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the new instance with host $host:$port.")
+      }
+    } recover {
+      case _ =>
+        println(s"${DateTime.now} - INFO: Instance $host still not ready, will wait 3 seconds.")
+        Thread.sleep(3000)
+        initialize(callback)
+    }
+  }
 
   def hasFreeSpace: Boolean = {
     for (i <- 0 to conf.ce_max_queue_size-1) {

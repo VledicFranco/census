@@ -14,7 +14,9 @@ import controllers.N4j
 import controllers.WebService
 import compute.EngineAlgorithm
 
-class Instance (host: String, port: Int, val id: String) extends WebService {
+class Instance (val h: String, val p: Int, val id: String) extends WebService {
+
+  setHost(h, p)
 
   var activeDatabase: N4j = null
 

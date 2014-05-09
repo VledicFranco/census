@@ -59,7 +59,7 @@ object GCE extends {
               "type" -> "ONE_TO_ONE_NAT",
               "name" -> "External NAT"
             )),
-            "network" -> s"$apiPrefix/global/networks/default"
+            "network" -> s"$apiPrefix/global/networks/census-framework"
           )),
           "disks" -> Json.arr(Json.obj(
             "autoDelete" -> "false",
@@ -88,25 +88,36 @@ object GCE extends {
   }
 
   def checkOperation (link: String, instanceID: String, callback: Instance=>Unit): Unit = {
-    WS.url(link).get map { response =>
-      if ((response.json \ "status").as[String] == "DONE") {
-        println(s"${DateTime.now} - INFO: $instanceID created.")
-        WS.url(s"$apiPrefix/zones/${conf.zone}/instances/$instanceID").get map { res =>
-          for (ip <- (res.json \ "networkInterfaces" \\ "networkIP")) {
+    getAccessToken { token => 
+      WS.url(link)
+        .withHeaders("Authorization" -> s"OAuth $token")
+        .get map { response => 
+          if ((response.json \ "status").as[String] == "DONE") {
+            println(s"${DateTime.now} - INFO: $instanceID created.")
+            getInstance(instanceID, callback)
+          } else {
+            println(s"${DateTime.now} - INFO: Instance $instanceID still not ready, will wait 3 seconds.")
+            Thread.sleep(3000)
+            checkOperation(link, instanceID, callback) 
+          }
+      } recover {
+        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service operation request.")
+      } 
+    }
+  }
+
+  def getInstance (instanceID: String, callback: Instance=>Unit):Unit = {
+    getAccessToken { token =>  
+      WS.url(s"$apiPrefix/zones/${conf.zone}/instances/$instanceID")
+        .withHeaders("Authorization" -> s"OAuth $token")
+        .get map { response =>
+          for (ip <- (response.json \ "networkInterfaces" \\ "networkIP")) {
             val instance = new Instance(ip.as[String], conf.census_engine_port, instanceID)
             instance.initialize(callback)
           }
-        } recover {
-          case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service instance request.")
-        }
-      } else {
-        println(s"${DateTime.now} - INFO: Instance $instanceID still not ready, will wait 3 seconds.")
-        Thread.sleep(3000)
-        checkOperation(link, instanceID, callback) 
+      } recover {
+        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service instance request.")
       }
-    } recover {
-      case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service operation request.")
-    } 
+    }
   }
-
 }

@@ -196,18 +196,4 @@ object GCE {
     )
   }
 
-/*
- *  def getInstance (instanceName: String, callback: Instance=>Unit):Unit = {
- *    getAccessToken { token =>  
- *      WS.url(s"$apiPrefixWithZone/instances/$instanceName")
- *        .withHeaders("Authorization" -> s"OAuth $token")
- *        .get map { response =>
- *          // response.json
- *      } recover {
- *        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service instance request.")
- *      }
- *    }
- *  }
- */
-
 }

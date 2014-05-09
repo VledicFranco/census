@@ -92,7 +92,8 @@ object GCE {
       WS.url(url)
         .withHeaders("Authorization" -> s"OAuth $token")
         .get map { response =>
-          validateAuthorizedRequest(url, response, { () => callback(response) })
+          validateAuthorizedRequest(url, response)
+          callback(response)
       } recover {
         case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service.")
       }
@@ -104,7 +105,8 @@ object GCE {
       WS.url(url)
         .withHeaders("Authorization" -> s"OAuth $token", "Content-Type" -> "application/json")
         .post(data) map { response =>
-          validateAuthorizedRequest(url, response, { () => callback(response) })
+          validateAuthorizedRequest(url, response)
+          callback(response)
       } recover {
         case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service.")
       }
@@ -116,14 +118,15 @@ object GCE {
       WS.url(url)
         .withHeaders("Authorization" -> s"OAuth $token", "Content-Type" -> "application/json")
         .delete map { response =>
-          validateAuthorizedRequest(url, response, { () => callback(response) })
+          validateAuthorizedRequest(url, response)
+          callback(response)
       } recover {
         case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service.")
       }
     }
   }
 
-  private def validateAuthorizedRequest (url: String, response: Response, callback: ()=>Unit): Unit = {
+  private def validateAuthorizedRequest (url: String, response: Response): Unit = {
     if (response.status != 200) {
       println(s"${DateTime.now} - ERROR: $url response status ${response.status}, printing json:")
       println(response.json)

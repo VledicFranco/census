@@ -69,6 +69,7 @@ object GCE extends {
           "disks" -> Json.arr(Json.obj(
             "autoDelete" -> "false",
             "source" -> s"$apiPrefix/zones/${conf.zone}/disks/census-engine-disk",
+            "mode" -> "READ_ONLY",
             "boot" -> "true"
           )),
           "serviceAccounts" -> Json.arr(Json.obj(

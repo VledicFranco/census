@@ -20,7 +20,7 @@ object GCE extends {
 
   private var token_expiration: Long = 0
 
-  private val apiPrefix: String = s"https://www.googleapis.com/compute/v1/project/${conf.project_id}"
+  private val apiPrefix: String = s"https://www.googleapis.com/compute/v1/projects/${conf.project_id}"
 
   private def getAccessToken (callback: String=>Unit): Unit = {
     if (access_token != null && System.currentTimeMillis < token_expiration) {
@@ -46,14 +46,14 @@ object GCE extends {
 
   def createInstance (callback: Instance=>Unit): Unit = {
     getAccessToken { token =>
+      val instanceID: String = s"census-engine-${Utils.genUUID}" 
       WS.url(s"$apiPrefix/zones/${conf.zone}/instances")
         .withHeaders("Authorization" -> s"OAuth $token",
                      "Host" -> "www.googleapis.com",
-                     "Content-Type" -> "application/json",
-                     "User-Agent" -> "google-api-java-client/1.0")
+                     "Content-Type" -> "application/json")
         .post(Json.obj(
-          "name" -> s"census-engine:${Utils.genUUID}",
-          "machineType" -> conf.census_engine_machine_type,
+          "name" -> instanceID,
+          "machineType" -> s"$apiPrefix/zones/${conf.zone}/machineTypes/${conf.census_engine_machine_type}",
           "networkInterfaces" -> Json.arr(Json.obj(
             "accessConfigs" -> Json.arr(Json.obj(
               "type" -> "ONE_TO_ONE_NAT",
@@ -61,12 +61,13 @@ object GCE extends {
             )),
             "network" -> s"$apiPrefix/global/networks/default"
           )),
-          "disk" -> Json.arr(Json.obj(
+          "disks" -> Json.arr(Json.obj(
             "autoDelete" -> "false",
-            "soruce" -> s"$apiPrefix/zones/${conf.zone}/disks/census-engine-disk",
+            "source" -> s"$apiPrefix/zones/${conf.zone}/disks/census-engine-disk",
             "boot" -> "true"
           )),
           "serviceAccounts" -> Json.arr(Json.obj(
+            "email" -> "default",
             "scopes" -> Json.arr(
               "https://www.googleapis.com/auth/devstorage.read_only"
             )
@@ -79,14 +80,33 @@ object GCE extends {
           )
         ) 
       ) map { response =>
-        for (ip <- (response.json \ "networkInterfaces" \\ "networkIP")) {
-          val instance = new Instance(ip.as[String], conf.census_engine_port)
-          instance.initialize(callback)
-        }
+        checkOperation((response.json \ "selfLink").as[String], instanceID, callback) 
       } recover {
         case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service.")
       }
     }
+  }
+
+  def checkOperation (link: String, instanceID: String, callback: Instance=>Unit): Unit = {
+    WS.url(link).get map { response =>
+      if ((response.json \ "status").as[String] == "DONE") {
+        println(s"${DateTime.now} - INFO: $instanceID created.")
+        WS.url(s"$apiPrefix/zones/${conf.zone}/instances/$instanceID").get map { res =>
+          for (ip <- (res.json \ "networkInterfaces" \\ "networkIP")) {
+            val instance = new Instance(ip.as[String], conf.census_engine_port, instanceID)
+            instance.initialize(callback)
+          }
+        } recover {
+          case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service instance request.")
+        }
+      } else {
+        println(s"${DateTime.now} - INFO: Instance $instanceID still not ready, will wait 3 seconds.")
+        Thread.sleep(3000)
+        checkOperation(link, instanceID, callback) 
+      }
+    } recover {
+      case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service operation request.")
+    } 
   }
 
 }

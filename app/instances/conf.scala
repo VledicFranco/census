@@ -14,7 +14,7 @@ object conf {
 
   val census_engine_startup_script: String = "gs://census-framework/engine-startup.sh"
 
-  val census_engine_port: Int = 9000
+  val census_engine_port: Int = 80
 
   val census_control_host: String = "127.0.0.1"
 

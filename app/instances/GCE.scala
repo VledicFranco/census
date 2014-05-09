@@ -30,14 +30,44 @@ object GCE {
     }
   }
 
-  def createInstance (callback: Instance=>Unit): Unit = {
+  def createInstance (callback: (String, Int)=>Unit): Unit = {
     val instanceName: String = s"census-engine-${Utils.genUUID}" 
     val diskName: String = s"disk-$instanceName"
     createDiskRequest(diskName, { () =>
       createInstanceRequest(instanceName, diskName, { () =>
-        val instance = new Instance(instanceName, conf.census_engine_port)
-        instance.initialize(callback)
+        callback(instanceName, conf.census_engine_port)
       })
+    })
+  }
+
+  def deleteInstance (instanceName: String, callback: ()=>Unit): Unit = {
+    deleteInstanceRequest(instanceName, callback)
+  }
+
+  private def createDiskRequest (diskName: String, callback: ()=>Unit): Unit = {  
+    authorizedPost(s"$apiPrefixWithZone/disks", createDiskPayload(diskName), { response =>
+      checkOperation((response.json \ "selfLink").as[String], { () =>
+        println(s"${DateTime.now} - INFO: $diskName created.")
+        callback()
+      }) 
+    }) 
+  }
+
+  private def createInstanceRequest (instanceName: String, diskName: String, callback: ()=>Unit): Unit = {
+    authorizedPost(s"$apiPrefixWithZone/instances", createInstancePayload(instanceName, diskName), { response =>
+      checkOperation((response.json \ "selfLink").as[String], { () =>
+        println(s"${DateTime.now} - INFO: $instanceName created.")
+        callback()
+      }) 
+    })
+  }
+
+  private def deleteInstanceRequest (instanceName: String, callback: ()=>Unit): Unit = {
+    authorizedDelete(s"$apiPrefixWithZone/instances/$instanceName", { response =>
+      checkOperation((response.json \ "selfLink").as[String], { () =>
+        println(s"${DateTime.now} - INFO: $instanceName deleted.")
+        callback()
+      }) 
     })
   }
 
@@ -61,7 +91,9 @@ object GCE {
     getAccessToken { token => 
       WS.url(url)
         .withHeaders("Authorization" -> s"OAuth $token")
-        .get map { callback } recover {
+        .get map { response =>
+          validateAuthorizedRequest(url, response, { () => callback(response) })
+      } recover {
         case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service.")
       }
     } 
@@ -71,28 +103,31 @@ object GCE {
     getAccessToken { token =>
       WS.url(url)
         .withHeaders("Authorization" -> s"OAuth $token", "Content-Type" -> "application/json")
-        .post(data) map { callback } recover {
+        .post(data) map { response =>
+          validateAuthorizedRequest(url, response, { () => callback(response) })
+      } recover {
         case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service.")
       }
     }    
   }
 
-  private def createDiskRequest (diskName: String, callback: ()=>Unit): Unit = {  
-    authorizedPost(s"$apiPrefixWithZone/disks", createDiskPayload(diskName), { response =>
-      checkOperation((response.json \ "selfLink").as[String], { () =>
-        println(s"${DateTime.now} - INFO: $diskName created.")
-        callback()
-      }) 
-    }) 
+  private def authorizedDelete (url: String, callback: Response=>Unit): Unit = {
+    getAccessToken { token =>
+      WS.url(url)
+        .withHeaders("Authorization" -> s"OAuth $token", "Content-Type" -> "application/json")
+        .delete map { response =>
+          validateAuthorizedRequest(url, response, { () => callback(response) })
+      } recover {
+        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service.")
+      }
+    }
   }
 
-  private def createInstanceRequest (instanceName: String, diskName: String, callback: ()=>Unit): Unit = {
-    authorizedPost(s"$apiPrefixWithZone/instances", createInstancePayload(instanceName, diskName), { response =>
-      checkOperation((response.json \ "selfLink").as[String], { () =>
-        println(s"${DateTime.now} - INFO: $instanceName created.")
-        callback()
-      }) 
-    })
+  private def validateAuthorizedRequest (url: String, response: Response, callback: ()=>Unit): Unit = {
+    if (response.status != 200) {
+      println(s"${DateTime.now} - ERROR: $url response status ${response.status}, printing json:")
+      println(response.json)
+    }
   }
 
   private def checkOperation (link: String, callback: ()=>Unit): Unit = {

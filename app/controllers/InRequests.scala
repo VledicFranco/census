@@ -13,7 +13,6 @@ import requests._
 
 import instances.Orchestrator
 import instances.Instance
-import instances.GCE
 
 /**
  * Module that handles the Play Framework http
@@ -28,18 +27,11 @@ object InRequests extends Controller {
 
   /** Route: GET /test */
   def test = Action {
-    //GCE.verifyToken
-//    val json = Json.obj(
-//      "arr" -> Json.arr(Json.obj(
-//        "some" -> "value"
-//      ))
-//    )
-//    for (a <- (json \ "arr" \\ "some")) {
-//      println(a.as[String])
-//    }
-    GCE.createInstance { instance =>
-      println(s"WOOT!! :: ${instance.host}")
-    }
+    Instance({ instance =>
+      instance.delete { () =>
+        println("Test finished.")
+      }
+    })
     Ok("Test init.")
   }
 

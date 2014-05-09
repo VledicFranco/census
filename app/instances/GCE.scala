@@ -135,9 +135,10 @@ object GCE {
       )),
       "disks" -> Json.arr(Json.obj(
         "kind" -> "compute#attachedDisk",
-        "boot" -> "true",
+        "boot" -> true,
         "type" -> "PERSISTENT",
         "mode" -> "READ_WRITE",
+        "autoDelete" -> true,
         "deviceName" -> diskName,
         "zone" -> apiPrefixWithZone,
         "source" -> s"$apiPrefixWithZone/disks/$diskName"

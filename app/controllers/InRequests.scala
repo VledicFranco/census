@@ -28,6 +28,7 @@ object InRequests extends Controller {
   /** Route: GET /test */
   def test = Action {
     Instance({ instance =>
+      println("Woot Instance ready.")
       instance.delete { () =>
         println("Test finished.")
       }

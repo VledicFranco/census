@@ -54,6 +54,11 @@ object GCE extends {
         .post(Json.obj(
           "name" -> instanceID,
           "machineType" -> s"$apiPrefix/zones/${conf.zone}/machineTypes/${conf.census_engine_machine_type}",
+          "tags" -> Json.obj(
+            "items" -> Json.arr(
+              "census-engine-instance"
+            )
+          ),
           "networkInterfaces" -> Json.arr(Json.obj(
             "accessConfigs" -> Json.arr(Json.obj(
               "type" -> "ONE_TO_ONE_NAT",

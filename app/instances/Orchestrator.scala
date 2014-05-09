@@ -58,7 +58,7 @@ object Orchestrator {
   private def createInstance (callback: ()=>Unit): Unit = {
     val ip = "127.0.0.1"
     val port = 9000
-    val instance = new Instance(ip, port, "id")
+    val instance = new Instance(ip, port)
     // Register Census Control HTTP hook.
     instance.post("/control", "{"
       +s""" "host": "${conf.census_control_host}", """

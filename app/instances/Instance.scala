@@ -14,7 +14,7 @@ import controllers.N4j
 import controllers.WebService
 import compute.EngineAlgorithm
 
-class Instance (val h: String, val p: Int, val id: String) extends WebService {
+class Instance (val h: String, val p: Int) extends WebService {
 
   setHost(h, p)
 
@@ -26,14 +26,21 @@ class Instance (val h: String, val p: Int, val id: String) extends WebService {
   var queue: Array[EngineAlgorithm] = new Array[EngineAlgorithm](conf.ce_max_queue_size)
 
   def initialize (callback: Instance=>Unit): Unit = {
-    post("/control", "{"
-      +s""" "host": "${conf.census_control_host}", """
-      +s""" "port": ${conf.census_control_port} """
-      + "}"
-    ) map { res => 
-      callback(this)
+    ping map { response =>
+      post("/control", "{"
+        +s""" "host": "${conf.census_control_host}", """
+        +s""" "port": ${conf.census_control_port} """
+        + "}"
+      ) map { res => 
+        callback(this)
+      } recover {
+        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the new instance with host $host:$port.")
+      }
     } recover {
-      case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the new instance with host $host:$port.")
+      case _ => 
+        println(s"${DateTime.now} - INFO: Service $host still not ready, will wait 3 seconds.")
+        Thread.sleep(3000)
+        initialize(callback)
     }
   }
 

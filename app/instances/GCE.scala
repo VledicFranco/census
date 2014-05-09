@@ -94,7 +94,8 @@ object GCE extends {
         .get map { response => 
           if ((response.json \ "status").as[String] == "DONE") {
             println(s"${DateTime.now} - INFO: $instanceID created.")
-            getInstance(instanceID, callback)
+            val instance = new Instance(instanceID, conf.census_engine_port)
+            instance.initialize(callback)
           } else {
             println(s"${DateTime.now} - INFO: Instance $instanceID still not ready, will wait 3 seconds.")
             Thread.sleep(3000)
@@ -106,18 +107,18 @@ object GCE extends {
     }
   }
 
-  def getInstance (instanceID: String, callback: Instance=>Unit):Unit = {
-    getAccessToken { token =>  
-      WS.url(s"$apiPrefix/zones/${conf.zone}/instances/$instanceID")
-        .withHeaders("Authorization" -> s"OAuth $token")
-        .get map { response =>
-          for (ip <- (response.json \ "networkInterfaces" \\ "networkIP")) {
-            val instance = new Instance(ip.as[String], conf.census_engine_port, instanceID)
-            instance.initialize(callback)
-          }
-      } recover {
-        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service instance request.")
-      }
-    }
-  }
+/*
+ *  def getInstance (instanceID: String, callback: Instance=>Unit):Unit = {
+ *    getAccessToken { token =>  
+ *      WS.url(s"$apiPrefix/zones/${conf.zone}/instances/$instanceID")
+ *        .withHeaders("Authorization" -> s"OAuth $token")
+ *        .get map { response =>
+ *          // response.json
+ *      } recover {
+ *        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service instance request.")
+ *      }
+ *    }
+ *  }
+ */
+
 }

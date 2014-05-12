@@ -27,12 +27,6 @@ object InRequests extends Controller {
 
   /** Route: GET /test */
   def test = Action {
-    Instance({ instance =>
-      println("Woot Instance ready.")
-      instance.delete { () =>
-        println("Test finished.")
-      }
-    })
     Ok("Test init.")
   }
 
@@ -66,7 +60,6 @@ object InRequests extends Controller {
     if (r.errors.length > 0)
       BadRequest(r.errorsToJson)
     else {
-//      RequestsQueue.enqueue(r)
       Ok(Json.obj(
         "status" -> "acknowledged",
         "token" -> r.algorithm.token

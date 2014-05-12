@@ -15,10 +15,19 @@ trait Request {
   var errors: Array[String] = Array()
 
   /** 
-   * Method to be overriden to check json variables.
    */
-  def validate: Unit = {}
+  def validate: Unit
+
+  def start: Unit
+
+  def execute: Unit = {
+    if (!hasErrors) start
+  }
   
+  def hasErrors: Boolean = {
+    errors.length > 0
+  }
+
   /**
    * Converts all the errors to a json error report.
    *

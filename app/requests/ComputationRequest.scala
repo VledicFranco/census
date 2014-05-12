@@ -67,7 +67,7 @@ class ComputationRequest (json: JsValue) extends Request {
   /**
    * Json validation.
    */
-  override def validate: Unit = {
+  def validate: Unit = {
     (json \ "algorithm").asOpt[String] match {
       case None => errors = errors :+ "'algorithm' field missing."
       case Some(data) => Library(data, this) match {
@@ -100,14 +100,11 @@ class ComputationRequest (json: JsValue) extends Request {
   /**
    * Request execution.
    */
-  def execute: Unit = {
-    if (errors.length > 0) return
-
+  def start: Unit = {
     database = new N4j
     database.tag = tag
     database.setHost(n4jhost, n4jport)
     database.setAuth(n4juser, n4jpassword)
-    
     // Check for server connectivity.
     database.ping map { response => 
       algorithm.enqueue

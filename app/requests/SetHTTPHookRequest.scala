@@ -35,7 +35,7 @@ object SetHTTPHookRequest {
  *
  * @param json of the request.
  */
-class SetHTTPHookRequest (val json: JsValue) extends SimpleRequest {
+class SetHTTPHookRequest (val json: JsValue) extends Request {
 
   /** The Census Control hostname. */
   var host: String = null
@@ -46,7 +46,7 @@ class SetHTTPHookRequest (val json: JsValue) extends SimpleRequest {
   /**
    * Json validation.
    */
-  override def validate: Unit = {
+  def validate: Unit = {
     (json \ "host").asOpt[String] match {
       case None => errors = errors :+ "'host' field missing."
       case Some(data) => host = data
@@ -60,8 +60,7 @@ class SetHTTPHookRequest (val json: JsValue) extends SimpleRequest {
   /**
    * Request execution.
    */
-  def execute: Unit = {
-    if (errors.length > 0) return
+  def start: Unit = {
     HTTPHook.setHost(host, port)
   }
 

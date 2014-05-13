@@ -27,19 +27,13 @@ object InRequests extends Controller {
 
   /** Route: GET /test */
   def test = Action {
-    Instance({ instance =>
-      println("Woot Instance ready.")
-      instance.delete { () =>
-        println("Test finished.")
-      }
-    })
     Ok("Test init.")
   }
 
   /** Route: POST /hook */ 
   def postHTTPHook = Action(parse.json) { implicit request =>
     val r = SetHTTPHookRequest(request.body)
-    if (r.errors.length > 0)
+    if (r.hasErrors)
       BadRequest(r.errorsToJson)
     else {
       Async {
@@ -63,10 +57,9 @@ object InRequests extends Controller {
   /** Route: POST /compute */ 
   def postCompute = Action(parse.json) { implicit request =>
     val r = ComputationRequest(request.body)
-    if (r.errors.length > 0)
+    if (r.hasErrors)
       BadRequest(r.errorsToJson)
     else {
-//      RequestsQueue.enqueue(r)
       Ok(Json.obj(
         "status" -> "acknowledged",
         "token" -> r.algorithm.token

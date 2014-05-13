@@ -107,7 +107,7 @@ class ComputationRequest (json: JsValue) extends Request {
     database.setAuth(n4juser, n4jpassword)
     // Check for server connectivity.
     database.ping map { response => 
-      algorithm.enqueue
+      algorithm.start
     } recover {
       case _ => 
         // Report: Neo4j server unreachable.

@@ -26,16 +26,8 @@ trait EngineRequest {
 
   val creationTime: Long = System.currentTimeMillis
 
-  def execute (instance: Instance): Unit = {
-    if (instance.activeDatabase != requester.database || instance.activeAlgorithm != name) {
-      instance.activeDatabase = requester.database
-      instance.activeAlgorithm = name
-      sendImportGraphRequest(instance)
-    } else {
-      sendComputationRequest(instance)
-    }
-  }
+  def start: Unit
 
-  def computationComplete: Unit
+  def complete: Unit
 
 }

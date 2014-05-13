@@ -11,7 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import scala.concurrent._
 import scala.collection.mutable.Queue
 
-import compute.EngineAlgorithm
+import compute.EngineRequest
 
 /**
  * Module that enqueues requests, processed as first
@@ -23,7 +23,7 @@ object Orchestrator {
   var isRunning: Boolean = false
 
   /** Queue for the requests. */
-  var queue: Queue[EngineAlgorithm] = Queue()
+  var queue: Queue[EngineRequest] = Queue()
 
   var pool: Array[Instance] = new Array[Instance](conf.max_instances) 
 
@@ -33,67 +33,20 @@ object Orchestrator {
    *
    * @param req
    */
-  def enqueue (req: EngineAlgorithm): Unit = {
+  def enqueue (req: EngineRequest): Unit = {
     // Add request to the queue.
-    queue.synchronized {
-      queue += req
-    }
+    queue += req
 
     if (isRunning) return
     isRunning = true
 
-    if (poolIsEmpty) {
-      createInstance(next)
-    } else {
-      future { next }
-    }
+    future { next }
   }
 
   def finished (host: String, token: String): Unit = {
-    val instance = getInstance(host)
-    instance.finished(token)
-    next()
-  }
-
-  private def createInstance (callback: ()=>Unit): Unit = {
-//    val ip = "127.0.0.1"
-//    val port = 9000
-//    val instance = new Instance(ip, port)
-//    // Register Census Control HTTP hook.
-//    instance.post("/control", "{"
-//      +s""" "host": "${conf.census_control_host}", """
-//      +s""" "port": ${conf.census_control_port} """
-//      + "}"
-//    ) map { res => 
-//      addInstanceToPool(instance) 
-//      callback()
-//    } recover {
-//      case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the new instance with host $ip:$port.")
-//    }
-  }
-
-  private def addInstanceToPool (instance: Instance): Unit = {
-    for (i <- 0 to conf.max_instances-1) {
-      if (pool(i) == null) {
-        pool(i) = instance
-        return
-      }
-    }
-  }
-
-  private def getInstance (host:String): Instance = {
-    for (i <- 0 to conf.max_instances-1) {
-      if (pool(i) != null && pool(i).host == host) 
-        return pool(i)
-    }
-    return null
-  }
-
-  private def poolIsEmpty: Boolean = {
-    for (i <- 0 to conf.max_instances-1) {
-      if (pool(i) != null) return false 
-    }
-    return true
+//    val instance = getInstance(host)
+//    instance.finished(token)
+//    next()
   }
 
   /**
@@ -110,7 +63,7 @@ object Orchestrator {
     
     var foundFreeInstance = false
 
-    for (instance: Instance <- pool) {
+    for (instance <- pool) {
       if (instance.hasFreeSpace) {
         foundFreeInstance = true
         instance.enqueue(queue.dequeue)

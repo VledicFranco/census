@@ -13,16 +13,7 @@ import controllers.HTTPHook
 import instances.Orchestrator
 import instances.Instance
 
-object Closeness {
-
-  def apply (requester: ComputationRequest): Closeness = {
-    val algo = new Closeness(requester)
-    algo
-  }
-
-}
-
-class Closeness (val requester: ComputationRequest) extends EngineAlgorithm {
+class ClosenessMN (val requester: ComputationRequest) extends EngineAlgorithm {
 
   val name = "Closeness"
   

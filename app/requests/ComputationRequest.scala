@@ -12,7 +12,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import controllers.HTTPHook
 import controllers.N4j
 import compute.Library
-import compute.EngineAlgorithm
+import compute.EngineRequest
 
 /**
  * Companion object to correctly build the request.
@@ -44,7 +44,7 @@ object ComputationRequest {
 class ComputationRequest (json: JsValue) extends Request {
 
   /** Algorithm to be executed. */
-  var algorithm: EngineAlgorithm = null
+  var algorithm: EngineRequest = null
 
   /** Moment when the request was created. */
   var creationTime: Long = 0

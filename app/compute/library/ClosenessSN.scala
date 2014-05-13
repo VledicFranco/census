@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package compute
+package compute.library
 
 import com.github.nscala_time.time.Imports._ 
 
@@ -14,16 +14,7 @@ import controllers.N4j
 import instances.Orchestrator
 import instances.Instance
 
-object SSCloseness {
-
-  def apply (source: String, r: ComputationRequest): SSCloseness = {
-    val algo = new SSCloseness(source, r)
-    algo
-  }
-
-}
-
-class SSCloseness (val source: String, val requester: ComputationRequest) extends EngineAlgorithm {
+class ClosenessSN (val source: String, val requester: ComputationRequest) extends EngineAlgorithm {
 
   val name = "SSCloseness"
 

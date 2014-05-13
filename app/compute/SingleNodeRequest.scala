@@ -9,6 +9,8 @@ import com.github.nscala_time.time.Imports._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-trait MultiNodeRequest {
+trait SingleNodeRequest {
+
+  def send (instance: Instance): Unit
 
 }

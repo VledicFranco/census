@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package compute
+package compute.library
 
 import requests.ComputationRequest 
 

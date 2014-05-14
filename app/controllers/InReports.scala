@@ -4,7 +4,7 @@
 
 package controllers
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.HashMap
 
 import com.github.nscala_time.time.Imports._ 
 
@@ -12,16 +12,18 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 
+import instances.Instance
+
 object InReports extends Controller {
 
-  private val listeners: ArrayBuffer[InReportsListener] = ArrayBuffer()
+  private val listeners: HashMap[Instances] = HashMap()
 
-  def register (listener: InReportsListener): Unit = {
-    listeners += listener
+  def register (listener: Instance): Unit = {
+    listeners += (listener.host -> listener)
   }
 
-  def unregister (listener: InReportsListener): Unit = {
-    listeners -= listener
+  def unregister (listener: Instance): Unit = {
+    listeners -= listener.host
   }
   
   /** Route: GET /test */ 
@@ -32,16 +34,20 @@ object InReports extends Controller {
   /** Route: POST /censusengine/report */ 
   def report = Action(parse.json) { implicit request =>
     val token = (request.body \ "token").as[String]
-    for (listener <- listeners) {
-      println(s"Report from ${request.remoteAddress}: $token")
-      listener.report(request.remoteAddress, token)
-    }
+    val host = request.remoteAddress
+    val listener = listeners.apply(host)
+    listener.report(token)
     Ok
   }
 
   /** Route: POST /censusengine/error */ 
   def error = Action(parse.json) { implicit request =>
-    println(s"${DateTime.now} - ERROR: ${request.body}")
+    val token = (request.body \ "token").as[String]
+    val error = (request.body \ "error").as[String]
+    val on = (request.body \ "on").as[String]
+    val host = request.remoteAddress
+    val listener = listeners.apply(host)
+    listener.error(token, error, on)
     Ok
   }
 

@@ -13,9 +13,10 @@ import play.api.libs.concurrent.Execution.Implicits._
 
 import controllers.N4j
 import controllers.WebService
+import controllers.InReports
 import requests.ComputationRequest
 import requests.Utils
-import compute.EngineRequest
+import compute.Sender
 
 object InstanceStatus extends Enumeration {
   val INITIALIZING, IDLE, COMPUTING, FAILED = Value
@@ -41,10 +42,8 @@ class Instance extends WebService {
 
   var status: InstanceStatus.Value = InstanceStatus.INITIALIZING
 
-  var activeRequest: ComputationRequest = null
-
   /** Queue for the requests. */
-  var queue: Array[EngineRequest] = new Array[EngineRequest](conf.ce_max_queue_size)
+  var queue: Array[Sender] = new Array[EngineRequest](conf.ce_max_queue_size)
 
   private def initialize (callback: Instance=>Unit): Unit = {
     GCE.createInstance { (h, p) =>
@@ -66,6 +65,7 @@ class Instance extends WebService {
         + "}"
       ) map { res => 
         status = InstanceStatus.IDLE
+        InReports.register(this)
         callback(this) 
       }
     } recover { case _ => 
@@ -80,17 +80,16 @@ class Instance extends WebService {
     println(s"${DateTime.now} - ERROR: Couldn't reach instance with host $host:$port.")
   }
 
-  def prepareForRequest (requester: ComputationRequest, callback: ()=>Unit): Unit = {
-    activeRequest = requester
+  def prepareForAlgorithm (algorithm: String, database: N4j, callback: ()=>Unit): Unit = {
     // Import graph.
     post("/graph", "{"
       +s""" "token": "${Utils.genUUID}", """
-      +s""" "algorithm": "${requester.algorithm.name}", """
-      +s""" "tag": "${requester.tag}", """
-      +s""" "host": "${requester.database.host}", """
-      +s""" "port": ${requester.database.port}, """
-      +s""" "user": "${requester.database.user}", """
-      +s""" "password": "${requester.database.password}" """
+      +s""" "algorithm": "$algorithm", """
+      +s""" "tag": "${database.tag}", """
+      +s""" "host": "${database.host}", """
+      +s""" "port": ${database.port}, """
+      +s""" "user": "${database.user}", """
+      +s""" "password": "${database.password}" """
       + "}"
     ) map { response => 
       val status = (response.json \ "status").as[String] 
@@ -104,6 +103,7 @@ class Instance extends WebService {
   }
 
   def delete (callback: ()=>Unit): Unit = {
+    InReports.unregister(this)
     GCE.deleteInstance(host, callback)
   }
 
@@ -114,7 +114,7 @@ class Instance extends WebService {
     return false
   }
 
-  def send (engineRequest: EngineRequest): Unit = {
+  def send (engineRequest: Sender): Unit = {
     for (i <- 0 to (queue.length-1)) {
       if (queue(i) == null) {
         queue(i) = engineRequest 
@@ -124,22 +124,25 @@ class Instance extends WebService {
     }
   }
 
-  def finished (token: String): Unit = {
+  def report (token: String): Unit = {
+    println(s"${DateTime.now} - INFO: Report from $host - $token")
     for (i <- 0 to (queue.length-1)) {
       if (queue(i) != null && queue(i).token == token) {
-        queue(i).computationComplete
+        queue(i).complete
         queue(i) = null
-        checkIfIdle
+        // If there are pending requests just return
+        // else set to IDLE.
+        for (request <- queue) {
+          if (request != null) return
+        }
+        status = InstanceStatus.IDLE
         return
       }
     }
   }
 
-  private def checkIfIdle: Unit = {
-    for (request <- queue) {
-      if (request != null) return
-    }
-    status = InstanceStatus.IDLE
+  def error (token: String, error: String, on: String) {
+    println(s"${DateTime.now} - ERROR: $error on $on for token: $token.")
   }
 
 }

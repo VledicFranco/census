@@ -11,7 +11,8 @@ import play.api.libs.concurrent.Execution.Implicits._
 import scala.concurrent._
 import scala.collection.mutable.Queue
 
-import compute.SingleNodeRequest
+import compute.Sender
+import controllers.N4j
 import controllers.InReportsListener
 import requests.ComputationRequest
 
@@ -29,7 +30,7 @@ object Orchestrator {
  * Module that enqueues requests, processed as first
  * come first served.
  */
-class Orchestrator (val size: Int, val requester: ComputationRequest) extends InReportsListener {
+class Orchestrator (val size: Int, val algorithm: String, val database: N4j) {
 
   /** Used to know if the requests are being processed. */
   private var isRunning: Boolean = false
@@ -38,12 +39,12 @@ class Orchestrator (val size: Int, val requester: ComputationRequest) extends In
   private val pool: Array[Instance] = new Array[Instance](size)
 
   /** Queue for the requests. */
-  private val queue: Queue[SingleNodeRequest] = Queue()
+  private val queue: Queue[Sender] = Queue()
 
   private def initialize (callback: Orchestrator=>Unit): Unit = {
     for (i <- 0 to (pool.length-1)) {
       pool(i) = Instance({ instance =>
-        instance.prepareForRequest(requester, { () =>
+        instance.prepareForAlgorithm(algorithm, database, { () =>
           if (instancesAreReady) callback(this)
         })
       })  
@@ -57,26 +58,17 @@ class Orchestrator (val size: Int, val requester: ComputationRequest) extends In
     return true
   }
 
-  def report (host: String, token: String): Unit = {
-    for (instance <- pool) {
-      if (instance.host == host) {
-        instance.finished(token)
-        next
-      }
-    }
-  }
-
   /**
    * Adds a request to the queue and starts the
    * processing if the queue is idle.
    *
    * @param req
    */
-  def enqueue (request: EngineRequest): Unit = {
+  def enqueue (request: Sender): Unit = {
     queue += request
     if (!isRunning) {
       isRunning = true
-      future { next }
+      future { continue }
     }
   }
 
@@ -85,7 +77,7 @@ class Orchestrator (val size: Int, val requester: ComputationRequest) extends In
    * himself as a callback of the request so that 
    * the queue continues after the request is done.
    */
-  private def next: Unit = {
+  def continue: Unit = {
     if (queue.isEmpty) {
       isRunning = false
       return
@@ -100,7 +92,7 @@ class Orchestrator (val size: Int, val requester: ComputationRequest) extends In
     // Continue untill instances are full.
     // The queue is restarted when the requests in 
     // the instance are finished.
-    if (foundFreeInstance) next
+    if (foundFreeInstance) continue
   }
 
 }

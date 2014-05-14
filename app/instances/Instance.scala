@@ -14,7 +14,6 @@ import play.api.libs.concurrent.Execution.Implicits._
 import controllers.N4j
 import controllers.WebService
 import controllers.InReports
-import requests.ComputationRequest
 import requests.Utils
 import compute.Sender
 
@@ -75,7 +74,7 @@ class Instance extends WebService {
     }
   }
 
-  private def instanceFailed: Unit = {
+  def failed: Unit = {
     status = InstanceStatus.FAILED
     println(s"${DateTime.now} - ERROR: Couldn't reach instance with host $host:$port.")
   }
@@ -98,7 +97,7 @@ class Instance extends WebService {
       else
         println(s"${DateTime.now} - ERROR: Census Engine response status:$status on graph import, please check for bugs.")
     } recover {
-      case _ => instanceFailed
+      case _ => failed
     }
   }
 

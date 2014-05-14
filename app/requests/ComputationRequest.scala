@@ -9,10 +9,11 @@ import scala.concurrent._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
+import instances.conf
 import controllers.HTTPHook
 import controllers.N4j
 import compute.Library
-import compute.EngineRequest
+import compute.Receiver
 
 /**
  * Companion object to correctly build the request.
@@ -44,7 +45,9 @@ object ComputationRequest {
 class ComputationRequest (json: JsValue) extends Request {
 
   /** Algorithm to be executed. */
-  var algorithm: EngineRequest = null
+  var algorithm: Receiver = null
+
+  var numberOfInstances: Int = 0
 
   /** Moment when the request was created. */
   var creationTime: Long = 0
@@ -74,6 +77,10 @@ class ComputationRequest (json: JsValue) extends Request {
         case None => errors = errors :+ s"No such algorithm '$data'"
         case Some(algo) => algorithm = algo
       }
+    }
+    (json \ "instances").asOpt[Int] match {
+      case None => numberOfInstances = conf.min_instances
+      case Some(number) => numberOfInstances = number
     }
     (json \ "graph" \ "tag").asOpt[String] match {
       case None => errors = errors :+ "'tag' field missing."
@@ -107,7 +114,7 @@ class ComputationRequest (json: JsValue) extends Request {
     database.setAuth(n4juser, n4jpassword)
     // Check for server connectivity.
     database.ping map { response => 
-      algorithm.start
+      algorithm.receive
     } recover {
       case _ => 
         // Report: Neo4j server unreachable.

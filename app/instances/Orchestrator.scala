@@ -18,8 +18,8 @@ import requests.ComputationRequest
 
 object Orchestrator {
   
-  def apply (size: Int, requester: ComputationRequest, callback: Orchestrator=>Unit): Orchestrator = {
-    val orchestrator = new Orchestrator(size, requester)
+  def apply (size: Int, algorithm: String, database: N4j, callback: Orchestrator=>Unit): Orchestrator = {
+    val orchestrator = new Orchestrator(size, algorithm, database)
     orchestrator.initialize(callback)
     orchestrator
   }

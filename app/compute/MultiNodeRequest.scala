@@ -15,7 +15,7 @@ trait MultiNodeRequest extends EngineRequest with Receiver {
 
   protected var orchestrator: Orchestrator = null
 
-  private var numNodes: Int = 0
+  protected var numNodes: Int = 0
 
   private var numCompletedNodes: Int = 0
 

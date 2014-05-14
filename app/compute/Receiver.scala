@@ -6,7 +6,7 @@ package compute
 
 trait Receiver {
   
-  def receive (numberOfInstances: Int): Unit
+  def receive: Unit
 
 }
 

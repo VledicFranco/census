@@ -13,12 +13,18 @@ import controllers.HTTPHook
 import instances.Orchestrator
 import instances.Instance
 
-class ClosenessMN (val requester: ComputationRequest) extends EngineAlgorithm {
-
-  val name = "Closeness"
+class ClosenessMN (val requester: ComputationRequest) extends MultiNodeRequest {
   
-  def enqueue: Unit = {
-    batch
+  def receive: Unit = {
+    orchestrator = Orchestrator(requester.numberOfInstances, "SSCloseness", requester.database, { orchestrator =>
+      batch
+    })
+  }
+
+  private def enqueueToOrchestrator (nodeId: String): Unit = {
+    numNodes += 1
+    val single = new ClosenessSN(nodeId, requester) 
+    orchestrator.enqueue(single)
   }
 
   /** 
@@ -75,19 +81,12 @@ class ClosenessMN (val requester: ComputationRequest) extends EngineAlgorithm {
   private def importArray (data: Array[Array[String]]): Boolean = {
     if (!data.isEmpty) {
       for (source: Array[String] <- data) {
-        // Create SSCloseness request and enqueue.
-        val sscloseness = SSCloseness(source(0), requester)
-        sscloseness.parentEngineAlgorithm = this  
-        sscloseness.enqueue
+        enqueueToOrchestrator(source(0))
       }
       return true
     } else {
       return false
     }
   }
-  
-  def sendComputationRequest (instance: Instance): Unit = {}
-
-  def computationComplete: Unit = {}
 
 }

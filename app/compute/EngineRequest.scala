@@ -11,8 +11,6 @@ import requests.Utils
 import requests.ComputationRequest
 
 trait EngineRequest {
-  
-  val algorithmName: String
 
   val requester: ComputationRequest
 

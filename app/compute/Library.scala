@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package compute.library
+package compute
 
 import requests.ComputationRequest 
 
@@ -19,9 +19,9 @@ object Library {
    * @return the object module of the corresponding algorithm.
    *         'None' if there was no matching algorithm.
    */
-  def apply (algorithm: String, request: ComputationRequest): Option[EngineAlgorithm] = {
+  def apply (algorithm: String, request: ComputationRequest): Option[Receiver] = {
     algorithm match {
-      case "Closeness" => Some(Closeness(request))
+      case "Closeness" => Some(new ClosenessMN(request))
       // Here add more cases for more algorithms.
       case _ => None
     }

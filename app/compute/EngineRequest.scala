@@ -26,7 +26,7 @@ trait EngineRequest {
 
   val creationTime: Long = System.currentTimeMillis
 
-  def start: Unit
+  def send (instance: Instance): Unit
 
   def complete: Unit
 

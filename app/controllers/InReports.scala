@@ -4,15 +4,25 @@
 
 package controllers
 
+import scala.collection.mutable.ArrayBuffer
+
 import com.github.nscala_time.time.Imports._ 
 
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 
-import instances.Orchestrator
-
 object InReports extends Controller {
+
+  private val listeners: ArrayBuffer[InReportsListener] = ArrayBuffer()
+
+  def register (listener: InReportsListener): Unit = {
+    listeners += listener
+  }
+
+  def unregister (listener: InReportsListener): Unit = {
+    listeners -= listener
+  }
   
   /** Route: GET /test */ 
   def test = Action { request => 
@@ -21,9 +31,10 @@ object InReports extends Controller {
   
   /** Route: POST /censusengine/report */ 
   def report = Action(parse.json) { implicit request =>
-    (request.body \ "token").asOpt[String] match {
-      case Some(token) => Orchestrator.finished(request.remoteAddress, token)
-      case None => println(s"${DateTime.now} - ERROR: Invalid Census Engine response, please check for bugs.")
+    val token = (request.body \ "token").as[String]
+    for (listener <- listeners) {
+      println(s"Report from ${request.remoteAddress}: $token")
+      listener.report(request.remoteAddress, token)
     }
     Ok
   }

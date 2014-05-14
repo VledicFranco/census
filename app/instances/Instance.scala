@@ -17,6 +17,10 @@ import requests.ComputationRequest
 import requests.Utils
 import compute.EngineRequest
 
+object InstanceStatus extends Enumeration {
+  val INITIALIZING, IDLE, COMPUTING, FAILED = Value
+}
+
 object Instance {
 
   def apply (callback: Instance=>Unit): Instance = {
@@ -34,6 +38,8 @@ object Instance {
 }
 
 class Instance extends WebService {
+
+  var status: InstanceStatus.Value = InstanceStatus.INITIALIZING
 
   var activeRequest: ComputationRequest = null
 
@@ -58,7 +64,10 @@ class Instance extends WebService {
         +s""" "host": "${conf.census_control_host}", """
         +s""" "port": ${conf.census_control_port} """
         + "}"
-      ) map { res => callback(this) }
+      ) map { res => 
+        status = InstanceStatus.IDLE
+        callback(this) 
+      }
     } recover { case _ => 
       println(s"${DateTime.now} - INFO: Service $host still not ready, will wait 3 seconds.")
       Thread.sleep(3000)
@@ -67,10 +76,11 @@ class Instance extends WebService {
   }
 
   private def instanceFailed: Unit = {
+    status = InstanceStatus.FAILED
     println(s"${DateTime.now} - ERROR: Couldn't reach instance with host $host:$port.")
   }
 
-  def prepareForRequest (requester: ComputationRequest, callback: Instance=>Unit): Unit = {
+  def prepareForRequest (requester: ComputationRequest, callback: ()=>Unit): Unit = {
     activeRequest = requester
     // Import graph.
     post("/graph", "{"
@@ -85,7 +95,7 @@ class Instance extends WebService {
     ) map { response => 
       val status = (response.json \ "status").as[String] 
       if (status == "acknowledged")
-        callback(instance)
+        callback()
       else
         println(s"${DateTime.now} - ERROR: Census Engine response status:$status on graph import, please check for bugs.")
     } recover {
@@ -119,9 +129,17 @@ class Instance extends WebService {
       if (queue(i) != null && queue(i).token == token) {
         queue(i).computationComplete
         queue(i) = null
+        checkIfIdle
         return
       }
     }
+  }
+
+  private def checkIfIdle: Unit = {
+    for (request <- queue) {
+      if (request != null) return
+    }
+    status = InstanceStatus.IDLE
   }
 
 }

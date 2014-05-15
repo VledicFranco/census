@@ -16,7 +16,7 @@ import instances.Instance
 
 object InReports extends Controller {
 
-  private val listeners: HashMap[Instances] = HashMap()
+  private val listeners: HashMap[String, Instance] = HashMap()
 
   def register (listener: Instance): Unit = {
     listeners += (listener.host -> listener)

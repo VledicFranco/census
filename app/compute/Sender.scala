@@ -4,7 +4,11 @@
 
 package compute
 
+import instances.Instance
+
 trait Sender {
+
+  val token: String
   
   def send (instance: Instance): Unit
 

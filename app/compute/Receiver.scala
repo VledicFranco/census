@@ -6,6 +6,8 @@ package compute
 
 trait Receiver {
   
+  val token: String
+
   def receive: Unit
 
 }

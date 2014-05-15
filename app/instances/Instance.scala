@@ -42,7 +42,7 @@ class Instance extends WebService {
   var status: InstanceStatus.Value = InstanceStatus.INITIALIZING
 
   /** Queue for the requests. */
-  var queue: Array[Sender] = new Array[EngineRequest](conf.ce_max_queue_size)
+  var queue: Array[Sender] = new Array(conf.ce_max_queue_size)
 
   private def initialize (callback: Instance=>Unit): Unit = {
     GCE.createInstance { (h, p) =>

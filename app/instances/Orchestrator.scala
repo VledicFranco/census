@@ -13,7 +13,6 @@ import scala.collection.mutable.Queue
 
 import compute.Sender
 import controllers.N4j
-import controllers.InReportsListener
 import requests.ComputationRequest
 
 object Orchestrator {
@@ -86,7 +85,7 @@ class Orchestrator (val size: Int, val algorithm: String, val database: N4j) {
     for (instance <- pool) {
       if (instance.hasFreeSpace) {
         foundFreeInstance = true
-        instance.enqueue(queue.dequeue)
+        instance.send(queue.dequeue)
       }
     }
     // Continue untill instances are full.

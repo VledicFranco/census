@@ -4,7 +4,8 @@
 
 package compute
 
-import requests.ComputationRequest 
+import compute.library._
+import requests.ComputationRequest
 
 /**
  * All the implemented graph algorithms must be registered in

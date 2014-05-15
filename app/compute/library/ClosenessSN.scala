@@ -9,10 +9,12 @@ import com.github.nscala_time.time.Imports._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
+import compute.SingleNodeRequest
+import compute.MultiNodeRequest
 import requests.ComputationRequest
 import instances.Instance
 
-class ClosenessSN (val source: String, val requester: ComputationRequest) extends SingleNodeRequest {
+class ClosenessSN (val source: String, val parent: MultiNodeRequest, val requester: ComputationRequest) extends SingleNodeRequest {
 
   def send (instance: Instance): Unit = {
     instance.post("/compute", "{"

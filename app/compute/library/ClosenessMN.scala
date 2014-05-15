@@ -2,11 +2,12 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package compute
+package compute.library
 
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
+import compute.MultiNodeRequest
 import requests.ComputationRequest
 import controllers.N4j
 import controllers.HTTPHook
@@ -23,7 +24,7 @@ class ClosenessMN (val requester: ComputationRequest) extends MultiNodeRequest {
 
   private def enqueueToOrchestrator (nodeId: String): Unit = {
     numNodes += 1
-    val single = new ClosenessSN(nodeId, requester) 
+    val single = new ClosenessSN(nodeId, this, requester) 
     orchestrator.enqueue(single)
   }
 

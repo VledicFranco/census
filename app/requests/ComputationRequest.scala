@@ -47,6 +47,8 @@ class ComputationRequest (json: JsValue) extends Request {
   /** Algorithm to be executed. */
   var algorithm: Receiver = null
 
+  var mainToken: String = ""
+
   var numberOfInstances: Int = 0
 
   /** Moment when the request was created. */

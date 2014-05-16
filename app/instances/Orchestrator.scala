@@ -57,6 +57,14 @@ class Orchestrator (val size: Int, val algorithm: String, val database: N4j) {
     return true
   }
 
+  def delete (callback: ()=>Unit): Unit = {
+    for (instance <- pool) {
+      instance.delete { () =>
+        if (pool.isEmpty) callback()
+      }
+    }
+  }
+
   /**
    * Adds a request to the queue and starts the
    * processing if the queue is idle.

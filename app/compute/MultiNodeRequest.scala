@@ -21,7 +21,10 @@ trait MultiNodeRequest extends EngineRequest with Receiver {
 
   private def complete: Unit = {
     completed = true
-    // Report to HTTP Hook
+    orchestrator.delete { () =>
+      println("INFO - All instances deleted.")
+      // Report to HTTP Hook
+    }
   }
 
   def singleNodeFinished: Unit = {

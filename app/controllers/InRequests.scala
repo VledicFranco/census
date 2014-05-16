@@ -27,6 +27,10 @@ object InRequests extends Controller {
 
   /** Route: GET /test */
   def test = Action {
+//    val json = Json.obj( "a" -> Json.arr(Json.obj("this" -> "success"))  )
+//    for (value <- (json \ "a" \\ "this")) {
+//      println(value.as[String])
+//    }
     Ok("Test init.")
   }
 

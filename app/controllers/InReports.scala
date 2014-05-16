@@ -19,11 +19,11 @@ object InReports extends Controller {
   private val listeners: HashMap[String, Instance] = HashMap()
 
   def register (listener: Instance): Unit = {
-    listeners += (listener.host -> listener)
+    listeners += (listener.ip -> listener)
   }
 
   def unregister (listener: Instance): Unit = {
-    listeners -= listener.host
+    listeners -= listener.ip
   }
   
   /** Route: GET /test */ 

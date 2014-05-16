@@ -30,12 +30,14 @@ object GCE {
     }
   }
 
-  def createInstance (callback: (String, Int)=>Unit): Unit = {
+  def createInstance (callback: (String, String, Int)=>Unit): Unit = {
     val instanceName: String = s"census-engine-${Utils.genUUID}" 
     val diskName: String = s"disk-$instanceName"
     createDiskRequest(diskName, { () =>
       createInstanceRequest(instanceName, diskName, { () =>
-        callback(instanceName, conf.census_engine_port)
+        getInstanceIp(instanceName, { ip =>
+          callback(instanceName, ip, conf.census_engine_port)
+        })
       })
     })
   }
@@ -68,6 +70,14 @@ object GCE {
         println(s"${DateTime.now} - INFO: $instanceName deleted.")
         callback()
       }) 
+    })
+  }
+
+  private def getInstanceIp (instanceName: String, callback: String=>Unit): Unit = {
+    authorizedGet(s"$apiPrefixWithZone/instances/$instanceName", { response =>
+      for (ip <- (response.json \ "networkInterfaces" \\ "networkIP")) {
+        callback(ip.as[String])
+      }     
     })
   }
 

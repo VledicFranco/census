@@ -41,11 +41,14 @@ class Instance extends WebService {
 
   var status: InstanceStatus.Value = InstanceStatus.INITIALIZING
 
+  var ip: String = ""
+
   /** Queue for the requests. */
   var queue: Array[Sender] = new Array(conf.ce_max_queue_size)
 
   private def initialize (callback: Instance=>Unit): Unit = {
-    GCE.createInstance { (h, p) =>
+    GCE.createInstance { (h, i, p) =>
+      ip = i
       setHost(h, p)
       setCensusControlCommunication(callback)
     }

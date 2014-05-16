@@ -1,5 +1,5 @@
 # Create root persistent disks.
-gcutil adddisk census-<control | engine>-disk --size_gb=10 --zone=us-central1-a --source_image=debian-7
+gcutil adddisk census-<control | engine | neo4j>-disk --size_gb=10 --zone=us-central1-a --source_image=debian-7
 
 # Create needed networks and firewalls for Census Control.
 gcutil addnetwork census-framework
@@ -12,6 +12,9 @@ gcutil addinstance census-control --disk=census-control-disk,boot --service_acco
 
 # Create testing gce instance for Census Engine.
 gcutil addinstance census-engine-test --disk=census-engine-disk,boot --service_account_scope=storage-ro --network=census-framework --zone=us-central1-a --machine_type=n1-highcpu-2 --metadata=startup-script-url:gs://census-framework/engine-startup.sh
+
+# Create neo4j instance.
+gcutil addinstance census-neo4j --disk=census-neo4j-disk,boot --service_account_scope=storage-ro --network=census-framework --zone=us-central1-a --machine_type=n1-standard-1
 
 # Get logs from instance.
 gcutil getserialportoutput <instance>

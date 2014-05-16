@@ -61,9 +61,11 @@ trait WebService {
    * @return a future that handles the web service response.
    */
   def post (path: String, data: String): Future[Response] = {
-    WS.url(s"http://$host:$port$path")
-      .withHeaders("Content-Type" -> "application/json")
-      .post(data)
+    var requestHolder = WS.url(s"http://$host:$port$path").withHeaders("Content-Type" -> "application/json")
+    if (user != "" && password != "") {
+      requestHolder = requestHolder.withAuth(user, password, com.ning.http.client.Realm.AuthScheme.BASIC)
+    }
+    requestHolder.post(data)
   }
 
   /**
@@ -73,7 +75,11 @@ trait WebService {
    * @return a future that handles the web service response.
    */
   def ping: Future[Response] = {
-    WS.url(s"http://$host:$port").withTimeout(2000).head()
+    var requestHolder = WS.url(s"http://$host:$port").withTimeout(2000)
+    if (user != "" && password != "") {
+      requestHolder = requestHolder.withAuth(user, password, com.ning.http.client.Realm.AuthScheme.BASIC)
+    }
+    requestHolder.head()
   }
 
 }

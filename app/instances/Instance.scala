@@ -29,9 +29,9 @@ object Instance {
     instance
   } 
 
-  def apply (host: String, callback: Instance=>Unit): Instance = {
+  def apply (host: String, ip: String, callback: Instance=>Unit): Instance = {
     val instance = new Instance
-    instance.initializeWithHost(host, callback)
+    instance.initializeWithHost(host, ip, callback)
     instance
   }
 
@@ -54,8 +54,9 @@ class Instance extends WebService {
     }
   }
 
-  private def initializeWithHost (host: String, callback: Instance=>Unit): Unit = {
-    setHost(host, conf.census_engine_port)
+  private def initializeWithHost (h: String, i: String, callback: Instance=>Unit): Unit = {
+    ip = i
+    setHost(h, conf.census_engine_port)
     setCensusControlCommunication(callback)
   }
 

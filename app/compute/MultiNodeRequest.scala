@@ -10,6 +10,7 @@ import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import instances.Orchestrator
+import controllers.HTTPHook
 
 trait MultiNodeRequest extends EngineRequest with Receiver {
 
@@ -21,9 +22,10 @@ trait MultiNodeRequest extends EngineRequest with Receiver {
 
   private def complete: Unit = {
     completed = true
+    requester.computationTime = System.currentTimeMillis - creationTime
+    HTTPHook.Report.computationFinished(requester)
     orchestrator.delete { () =>
       println("INFO - All instances deleted.")
-      // Report to HTTP Hook
     }
   }
 

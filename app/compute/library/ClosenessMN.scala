@@ -33,9 +33,10 @@ class ClosenessMN (val requester: ComputationRequest) extends MultiNodeRequest {
    */
   private def batch: Unit = {
     requester.database.query(
-      s"MATCH (n:${requester.database.tag}) "
+       s"MATCH (n:${requester.database.tag}) "
       + "WHERE not(has(n.censuscheck)) "
       + "WITH n LIMIT 1000 "
+      +s"MATCH (n)--(r:${requester.database.tag}) "
       + "SET n.censuscheck = true "
       + "RETURN n.id"
     ) map {

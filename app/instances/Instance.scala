@@ -18,7 +18,7 @@ import compute.Sender
 import utils.Utils
 
 object InstanceStatus extends Enumeration {
-  val INITIALIZING, IDLE, COMPUTING, FAILED = Value
+  val INITIALIZING, IDLE, COMPUTING, FAILED, DELETED = Value
 }
 
 object Instance {
@@ -108,7 +108,10 @@ class Instance extends WebService {
 
   def delete (callback: ()=>Unit): Unit = {
     InReports.unregister(this)
-    GCE.deleteInstance(host, callback)
+    GCE.deleteInstance(host, { () => 
+      status = InstanceStatus.DELETED
+      callback()
+    })
   }
 
   def hasFreeSpace: Boolean = {

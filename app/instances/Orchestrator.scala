@@ -44,33 +44,32 @@ class Orchestrator (val size: Int, val algorithm: String, val database: N4j) {
     for (i <- 0 to (pool.length-1)) {
       pool(i) = Instance({ instance =>
         instance.prepareForAlgorithm(algorithm, database, { () =>
-          if (instancesAreReady) callback(this)
+          if (poolIsReady) callback(this)
         })
       })  
     }
   }
 
-  private def instancesAreReady: Boolean = {
+  private def poolIsReady: Boolean = {
     for (instance <- pool) {
       if (instance.status != InstanceStatus.IDLE) return false
     }
     return true
   }
 
-  def delete (callback: ()=>Unit): Unit = {
-    for (i <- 0 to (pool.length-1)) {
-      pool(i).delete { () =>
-        if (poolIsEmpty) callback()
-      }
-      pool(i) = null
-    }
-  }
-
-  def poolIsEmpty: Boolean = {
+  private def poolIsDeleted: Boolean = {
     for (instance <- pool) {
-      if (instance != null) return false
+      if (instance.status != InstanceStatus.DELETED) return false
     }
     return true
+  }
+
+  def delete (callback: ()=>Unit): Unit = {
+    for (instance <- pool) {
+      instance.delete { () =>
+        if (poolIsDeleted) callback()
+      }
+    }
   }
 
   /**

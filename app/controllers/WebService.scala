@@ -19,7 +19,7 @@ trait WebService {
   var port: Int = 0
 
   /** Host name where the web service is located. */
-  var host: String = ""
+  var host: String = "unset"
 
   /** User for authenticating requests. */
   var user: String = "root"

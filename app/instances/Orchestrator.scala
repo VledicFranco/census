@@ -58,11 +58,19 @@ class Orchestrator (val size: Int, val algorithm: String, val database: N4j) {
   }
 
   def delete (callback: ()=>Unit): Unit = {
-    for (instance <- pool) {
-      instance.delete { () =>
-        if (pool.isEmpty) callback()
+    for (i <- 0 to (pool.length-1)) {
+      pool(i).delete { () =>
+        if (poolIsEmpty) callback()
       }
+      pool(i) = null
     }
+  }
+
+  def poolIsEmpty: Boolean = {
+    for (instance <- pool) {
+      if (instance != null) return false
+    }
+    return true
   }
 
   /**

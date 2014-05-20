@@ -25,7 +25,7 @@ trait MultiNodeRequest extends EngineRequest with Receiver {
     requester.computationTime = System.currentTimeMillis - creationTime
     HTTPHook.Report.computationFinished(requester)
     orchestrator.delete { () =>
-      println("INFO - All instances deleted.")
+      println(s"${DateTime.now} INFO - All instances deleted.")
     }
   }
 

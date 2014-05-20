@@ -50,6 +50,7 @@ class Instance extends WebService {
     GCE.createInstance { (h, i, p) =>
       ip = i
       setHost(h, p)
+      println(s"${DateTime.now} - INFO: Will wait for census engine service $host.")
       setCensusControlCommunication(callback)
     }
   }
@@ -61,7 +62,6 @@ class Instance extends WebService {
   }
 
   private def setCensusControlCommunication (callback: Instance=>Unit): Unit = {
-    println(s"${DateTime.now} - INFO: Waiting for census engine service $host.")
     ping map { response =>
       println(s"${DateTime.now} - INFO: Census engine service $host ready.")
       post("/control", "{"

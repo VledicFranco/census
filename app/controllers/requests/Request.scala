@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package requests
+package controllers.requests
 
 import play.api.libs.json._
 

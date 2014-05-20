@@ -8,9 +8,9 @@ import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import compute.MultiNodeRequest
-import requests.ComputationRequest
 import controllers.N4j
 import controllers.HTTPHook
+import controllers.requests.ComputationRequest
 import instances.Orchestrator
 import instances.Instance
 

@@ -14,8 +14,8 @@ import play.api.libs.concurrent.Execution.Implicits._
 import controllers.N4j
 import controllers.WebService
 import controllers.InReports
-import requests.Utils
 import compute.Sender
+import utils.Utils
 
 object InstanceStatus extends Enumeration {
   val INITIALIZING, IDLE, COMPUTING, FAILED = Value

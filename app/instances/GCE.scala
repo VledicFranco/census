@@ -12,7 +12,7 @@ import play.api.libs.ws._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import requests.Utils
+import utils.Utils
 
 object GCE {
 

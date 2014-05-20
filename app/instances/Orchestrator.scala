@@ -13,7 +13,7 @@ import scala.collection.mutable.Queue
 
 import compute.Sender
 import controllers.N4j
-import requests.ComputationRequest
+import controllers.requests.ComputationRequest
 
 object Orchestrator {
   

@@ -11,7 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 
 import compute.SingleNodeRequest
 import compute.MultiNodeRequest
-import requests.ComputationRequest
+import controllers.requests.ComputationRequest
 import instances.Instance
 
 class ClosenessSN (val source: String, val parent: MultiNodeRequest, val requester: ComputationRequest) extends SingleNodeRequest {

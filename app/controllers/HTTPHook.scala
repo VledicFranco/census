@@ -32,13 +32,12 @@ object HTTPHook extends WebService {
     }
   }
 
-  def error (token: String, error: String, on: String): Unit = {
+  def error (token: String, error: String): Unit = {
     if (host == "unset") return
     post("/censuscontrol/error", "{"
       +s""" "token": "$token", """
       + """ "status": "error", """
       +s""" "error": "$error", """
-      +s""" "on": "$on" """
       + "}"
     ) recover {
       case _ => println(s"${DateTime.now} - WARNING: Unreachable HTTP hook server.")
@@ -62,6 +61,16 @@ object HTTPHook extends WebService {
    */
   object Error {
     
+    def invalidN4jFormat (request: ComputationRequest): Unit = {
+      error(request.token, "invalid-neo4j-format")
+      println(s"${DateTime.now} - ERROR: Invalid Neo4j format.") 
+    }
+
+    def unreachableN4j (request: ComputationRequest): Unit = {
+      error(request.token, "unreachable-neo4j")
+      println(s"${DateTime.now} - ERROR: Unreachable Neo4j server.")
+    }
+
   }
 
 }

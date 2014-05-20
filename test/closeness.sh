@@ -1,10 +1,11 @@
 curl -X POST -H "Content-Type: application/json" -d '{
   "algorithm": "Closeness",
+  "instances": 2,
   "graph": {
     "tag": "Person",
-    "host": "census.sb02.stations.graphenedb.com",
-    "port": 24789,
+    "host": "host.com",
+    "port": 7474,
     "user": "census",
-    "password": "rBX0DoF5iPbIhevAtGfx"
+    "password": "root"
   }
-}' http://107.178.218.117:9595/compute
+}' http://0.0.0.0:9595/compute

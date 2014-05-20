@@ -9,7 +9,8 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import requests._
+import controllers.requests.SetHTTPHookRequest
+import controllers.requests.ComputationRequest
 
 import instances.Orchestrator
 import instances.Instance
@@ -27,10 +28,6 @@ object InRequests extends Controller {
 
   /** Route: GET /test */
   def test = Action {
-//    val json = Json.obj( "a" -> Json.arr(Json.obj("this" -> "success"))  )
-//    for (value <- (json \ "a" \\ "this")) {
-//      println(value.as[String])
-//    }
     Ok("Test init.")
   }
 

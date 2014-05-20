@@ -128,7 +128,6 @@ class Instance extends WebService {
   }
 
   def report (token: String): Unit = {
-    println(s"${DateTime.now} - INFO: Report from $host - $token")
     for (i <- 0 to (queue.length-1)) {
       if (queue(i) != null && queue(i).token == token) {
         queue(i).complete

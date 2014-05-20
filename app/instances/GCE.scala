@@ -48,6 +48,7 @@ object GCE {
 
   private def createDiskRequest (diskName: String, callback: ()=>Unit): Unit = {  
     authorizedPost(s"$apiPrefixWithZone/disks", createDiskPayload(diskName), { response =>
+      println(s"${DateTime.now} - INFO: Creating $diskName.")
       checkOperation((response.json \ "selfLink").as[String], { () =>
         println(s"${DateTime.now} - INFO: $diskName created.")
         callback()
@@ -57,6 +58,7 @@ object GCE {
 
   private def createInstanceRequest (instanceName: String, diskName: String, callback: ()=>Unit): Unit = {
     authorizedPost(s"$apiPrefixWithZone/instances", createInstancePayload(instanceName, diskName), { response =>
+      println(s"${DateTime.now} - INFO: Creating $instanceName.")
       checkOperation((response.json \ "selfLink").as[String], { () =>
         println(s"${DateTime.now} - INFO: $instanceName created.")
         callback()
@@ -66,6 +68,7 @@ object GCE {
 
   private def deleteInstanceRequest (instanceName: String, callback: ()=>Unit): Unit = {
     authorizedDelete(s"$apiPrefixWithZone/instances/$instanceName", { response =>
+      println(s"${DateTime.now} - INFO: Deleting $instanceName.")
       checkOperation((response.json \ "selfLink").as[String], { () =>
         println(s"${DateTime.now} - INFO: $instanceName deleted.")
         callback()
@@ -148,7 +151,6 @@ object GCE {
       if ((response.json \ "status").as[String] == "DONE") {
         callback()
       } else {
-        println(s"${DateTime.now} - INFO: Operation $link still not ready, will wait 3 seconds.")
         Thread.sleep(3000)
         checkOperation(link, callback) 
       }

@@ -12,7 +12,7 @@ object conf {
 
   val census_engine_port: Int = 9000
 
-  val census_engine_machine_type: String = "n1-highcpu-2"
+  val census_engine_machine_type: String = "n1-highcpu-16"
 
   val census_engine_startup_script: String = "gs://census-framework/engine-startup.sh"
   

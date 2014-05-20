@@ -63,7 +63,7 @@ object InRequests extends Controller {
     else {
       Ok(Json.obj(
         "status" -> "acknowledged",
-        "token" -> r.algorithm.token
+        "token" -> r.token
       ))
     }
   }

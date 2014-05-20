@@ -7,9 +7,9 @@ package compute
 import instances.Instance
 
 trait Sender {
-
-  val token: String
   
+  val token: String
+
   def send (instance: Instance): Unit
 
   def complete: Unit

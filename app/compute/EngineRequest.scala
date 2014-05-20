@@ -12,11 +12,11 @@ import utils.Utils
 
 trait EngineRequest {
 
+  val token: String = Utils.genUUID
+
   val requester: ComputationRequest
 
   var completed: Boolean = false
-
-  val token: String = Utils.genUUID
 
   val creationTime: Long = System.currentTimeMillis
 

@@ -6,10 +6,14 @@ package controllers.requests
 
 import play.api.libs.json._
 
+import utils.Utils
+
 /**
  * An in request to be validated.
  */
 trait Request {
+
+  val token: String = Utils.genUUID
   
   /** Array used to store all the validation errors. */
   var errors: Array[String] = Array()

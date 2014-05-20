@@ -61,7 +61,9 @@ class Instance extends WebService {
   }
 
   private def setCensusControlCommunication (callback: Instance=>Unit): Unit = {
+    println(s"${DateTime.now} - INFO: Waiting for census engine service $host.")
     ping map { response =>
+      println(s"${DateTime.now} - INFO: Census engine service $host ready.")
       post("/control", "{"
         +s""" "host": "${conf.census_control_host}", """
         +s""" "port": ${conf.census_control_port} """
@@ -72,7 +74,6 @@ class Instance extends WebService {
         callback(this) 
       }
     } recover { case _ => 
-      println(s"${DateTime.now} - INFO: Service $host still not ready, will wait 3 seconds.")
       Thread.sleep(3000)
       setCensusControlCommunication(callback)
     }

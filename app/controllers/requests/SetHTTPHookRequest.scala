@@ -30,17 +30,16 @@ object SetHTTPHookRequest {
 }
 
 /**
- * An in simple request that registers
- * the Census Control server information.
+ * Sets the server information for the HTTP hook.
  *
  * @param json of the request.
  */
 class SetHTTPHookRequest (val json: JsValue) extends Request {
 
-  /** The Census Control hostname. */
+  /** The service hostname. */
   var host: String = null
 
-  /** The Census Control port. */
+  /** The service port. */
   var port: Int = 0
 
   /**

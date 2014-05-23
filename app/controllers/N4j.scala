@@ -9,7 +9,7 @@ import play.api.libs.ws._
 import play.api.libs.concurrent.Execution.Implicits._
 
 /**
- * Module that handles the Neo4j http queries.
+ * Class that handles the Neo4j http queries.
  */
 class N4j extends WebService {
 

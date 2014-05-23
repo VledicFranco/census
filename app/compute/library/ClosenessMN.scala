@@ -14,14 +14,27 @@ import controllers.requests.ComputationRequest
 import instances.Orchestrator
 import instances.Instance
 
+/**
+ * MultiNodeRequest implementation for Freeman's Closeness.
+ */
 class ClosenessMN (val requester: ComputationRequest) extends MultiNodeRequest {
   
+  /**
+   * Called by the ComputationRequest to initiate this
+   * EngineRequest. Creates an orchestrator formated for the computation of
+   * Single Source Closeness algorithms.
+   */
   def receive: Unit = {
     orchestrator = Orchestrator(requester.numberOfInstances, "SSCloseness", requester.database, { orchestrator =>
       batch
     })
   }
 
+  /**
+   * Invoked for every node in the graph database with the provided tag.
+   * Creates one ClosenessSN (Closeness Single Node) request for every node
+   * and enqueues it to the orchestrator.
+   */
   private def enqueueToOrchestrator (nodeId: String): Unit = {
     numNodes += 1
     val single = new ClosenessSN(nodeId, this, requester) 
@@ -72,9 +85,9 @@ class ClosenessMN (val requester: ComputationRequest) extends MultiNodeRequest {
   }
 
   /**
-   * Imports an already parsed json response from Neo4j, this method
-   * uses the abstract method 'insertTriple'. If it receives an empty
-   * array, it assumes that there are no more nodes to import.
+   * Imports an already parsed json response from Neo4j.
+   * If it receives an empty array, it assumes that there 
+   * are no more nodes to import.
    *
    * @param data the parsed array with the triplets from Neo4j.
    * @return 'true' if there is still more batch imports to do.

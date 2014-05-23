@@ -15,9 +15,8 @@ import scala.concurrent.Future
 import requests._
 
 /** 
- * Module that handles the reports to the Census Control
- * server by sending http requests to it with the report
- * as json.
+ * Module that handles the reports to an external web service
+ * by sending http requests to it with the report as json.
  */
 object HTTPHook extends WebService {
 

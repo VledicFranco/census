@@ -4,6 +4,9 @@
 
 package instances
 
+/**
+ * Default configuration for the GCE flow.
+ */
 object conf {
 
   val project_id: String = "vidtecci-cloud"

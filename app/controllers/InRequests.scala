@@ -16,7 +16,7 @@ import instances.Orchestrator
 import instances.Instance
 
 /**
- * Module that handles the Play Framework http
+ * Module that handles the Play Framework HTTP main Census Control
  * requests.
  */
 object InRequests extends Controller {

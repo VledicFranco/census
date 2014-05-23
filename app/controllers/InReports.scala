@@ -14,14 +14,28 @@ import play.api.libs.json._
 
 import instances.Instance
 
+/**
+ * Module that receives reports from the Census Engine instances.
+ */
 object InReports extends Controller {
 
+  /** Map with all the Census Engine instances. */
   private val listeners: HashMap[String, Instance] = HashMap()
 
+  /**
+   * Registers a new instance to the listeners Map.
+   *
+   * @param instance that will listen for reports.
+   */
   def register (listener: Instance): Unit = {
     listeners += (listener.ip -> listener)
   }
 
+  /**
+   * Unregisters an instance from the listeners Map.
+   *
+   * @param instance that will stop listening for reports.
+   */
   def unregister (listener: Instance): Unit = {
     listeners -= listener.ip
   }

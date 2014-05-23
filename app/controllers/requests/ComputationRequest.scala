@@ -47,23 +47,28 @@ class ComputationRequest (json: JsValue) extends Request {
   /** Algorithm to be executed. */
   var algorithm: Receiver = null
 
-  var mainToken: String = ""
-
+  /** Size of the orchestration, only used for MultiNodeRequests. */
   var numberOfInstances: Int = 0
 
   /** Moment when the request was created. */
   var creationTime: Long = 0
 
+  /** Tag used for the Neo4j importation. */
   var tag: String = null
 
+  /** Neo4j database that will be used for the node importation. */
   var database: N4j = null
 
+  /** Neo4j database host. */
   var n4jhost: String = null
 
+  /** Neo4j database port. */
   var n4jport: Int = 0
 
+  /** Neo4j database username. */
   var n4juser: String = null
 
+  /** Neo4j database password. */
   var n4jpassword: String = null
 
   /** The amount of milliseconds that the computation took. */

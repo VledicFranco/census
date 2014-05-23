@@ -14,8 +14,17 @@ import compute.MultiNodeRequest
 import controllers.requests.ComputationRequest
 import instances.Instance
 
+/**
+ * SingleNodeRequest implementation for the Freeman's Closeness.
+ */
 class ClosenessSN (val source: String, val parent: MultiNodeRequest, val requester: ComputationRequest) extends SingleNodeRequest {
 
+  /** 
+   * Invoked by the instance when the request enters it's queue.
+   * Sends the acutal HTTP request.
+   * 
+   * @param instance which will receive the HTTP request.
+   */
   def send (instance: Instance): Unit = {
     instance.post("/compute", "{"
       +s""" "token": "$token", """

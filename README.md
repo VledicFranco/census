@@ -47,16 +47,16 @@ Google Compute Engine Setup
 
 To setup the project on Google Compute Engine the following must be done:
 
-0) Setup `gcutil`
-1) Create the Census Framework network.
-2) Install Census Control on a booteable disk.
-3) Install Census Engine on a booteable disk.
-4) Create a disk snapshot of the Census Engine disk.
-5) Add the Census Engine startup script to Google Cloud Storage.
-6) Check the configuration in the Census Control `instance` package.
-7) Start the Census Control service.
+0. Setup `gcutil`
+1. Create the Census Framework network.
+2. Install Census Control on a booteable disk.
+3. Install Census Engine on a booteable disk.
+4. Create a disk snapshot of the Census Engine disk.
+5. Add the Census Engine startup script to Google Cloud Storage.
+6. Check the configuration in the Census Control `instance` package.
+7. Start the Census Control service.
 
-### 0) Setup gcutil
+### 0 Setup gcutil
 
 Check [this](https://developers.google.com/compute/docs/gcutil/) link to install and setup `gcutil`.
 
@@ -67,7 +67,7 @@ gcloud auth login
 gcloud config set project <project_id>
 ```
 
-### 1) Create the Census Framework network
+### 1 Create the Census Framework network
 
 Create the network.
 ```
@@ -86,7 +86,7 @@ Allow communication between Census instances inside the GCE virtual network.
 gcutil addfirewall census-framework-allow-internal --network=census-framework --allowed_ip_sources=10.0.0.0/8 --allowed="tcp:1-65535,udp:1-65535,icmp"
 ```
 
-### 2) Install Census Control on a booteable disk
+### 2 Install Census Control on a booteable disk
 
 Create the Census Control bootable disk with Debian 7 and 10gb of space. 
 ```
@@ -123,7 +123,7 @@ Delete the instance if you want.
 gcutil deleteinstance census-control
 ```
 
-### 3) Install Census Engine on a booteable disk
+### 3 Install Census Engine on a booteable disk
 
 Create the Census Engine bootable disk with Debian 7 and 10gb of space. 
 ```
@@ -162,13 +162,13 @@ Delete the instance (you wont need this instance anymore).
 gcutil deleteinstance census-engine
 ```
 
-### 4) Create a disk snapshot of the Census Engine disk
+### 4 Create a disk snapshot of the Census Engine disk
 
 ```
 gcutil addsnapshot census-engine-snapshot --source_disk=census-engine-disk
 ```
 
-### 5) Add the Census Engine startup script to Google Cloud Storage
+### 5 Add the Census Engine startup script to Google Cloud Storage
 
 [Upload](https://developers.google.com/storage/docs/json_api/v1/how-tos/upload) a startup script to Google Cloud Storage for the Census Engine future instances.
 
@@ -182,11 +182,11 @@ cd /usr/share/census-engine
 
 _Note: You will need to change the startup script url in the Census Control instances configuration._
 
-### 6) Check the configuration in the Census Control instance package
+### 6 Check the configuration in the Census Control instance package
 
 In the census-control instance, inside the Census Control project `/usr/share/census-control/app/instances/conf.scala` change the desired configuration.
 
-### 7) Start the Census Control service
+### 7 Start the Census Control service
 
 ```
 gcutil ssh census-control

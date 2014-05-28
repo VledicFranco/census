@@ -1,6 +1,8 @@
-Census Framework Documentation
-==============================
+Census Framework
+================
 
+Census is a service built on top of [Signal Collect](http://uzh.github.io/signal-collect/) and deployed in [Google Compute Engine](https://cloud.google.com/products/compute-engine) that creates graph computing instances on demand.
+ 
 System Architecture
 -------------------
 

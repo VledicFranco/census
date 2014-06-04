@@ -23,6 +23,7 @@ object Library {
   def apply (algorithm: String, request: ComputationRequest): Option[Receiver] = {
     algorithm match {
       case "Closeness" => Some(new ClosenessMN(request))
+      case "Betweenness" => Some(new BrandesBetweennessMN(request))
       // Here add more cases for more algorithms.
       case _ => None
     }

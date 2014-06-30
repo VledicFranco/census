@@ -17,7 +17,7 @@ import instances.Instance
 /**
  * SingleNodeRequest implementation for the Freeman's Closeness.
  */
-class ClosenessSN (val source: String, val parent: MultiNodeRequest, val requester: ComputationRequest) extends SingleNodeRequest {
+class BrandesBetweennessSN (val source: String, val parent: MultiNodeRequest, val requester: ComputationRequest) extends SingleNodeRequest {
 
   /** 
    * Invoked by the instance when the request enters it's queue.
@@ -30,7 +30,7 @@ class ClosenessSN (val source: String, val parent: MultiNodeRequest, val request
       +s""" "token": "$token", """
       + """ "algorithm": "BrandesBetweenness", """
       +s""" "creationTime": $creationTime, """
-      +s""" "vars": { "source": "$source" } """
+      +s""" "vars": ["$source"] """
       + "}"
     ) map {
       response =>

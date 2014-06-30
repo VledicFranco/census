@@ -30,7 +30,7 @@ class ClosenessSN (val source: String, val parent: MultiNodeRequest, val request
       +s""" "token": "$token", """
       + """ "algorithm": "SSCloseness", """
       +s""" "creationTime": $creationTime, """
-      +s""" "vars": { "source": "$source" } """
+      +s""" "vars": ["$source"] """
       + "}"
     ) map {
       response =>

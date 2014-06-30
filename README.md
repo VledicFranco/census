@@ -198,6 +198,7 @@ In the census-control instance, inside the Census Control project `/usr/share/ce
 ### 7 Start the Census Control service
 
 ```
+gcutil addinstance census-control --disk=census-control-disk,boot  --network=census-framework --zone=us-central1-a --machine_type=n1-highcpu-2 --service_account_scope=compute-rw
 gcutil ssh census-control
 
 sudo -s

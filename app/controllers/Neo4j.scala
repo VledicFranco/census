@@ -4,14 +4,12 @@
 
 package controllers
 
-import scala.concurrent.Future
-import play.api.libs.ws._
-import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.ws.Response
 
 /**
  * Class that handles the Neo4j http queries.
  */
-class N4j extends WebService {
+class Neo4j extends WebService {
 
   var tag: String = null
 
@@ -20,10 +18,12 @@ class N4j extends WebService {
    * server.
    *
    * @param query string (cypher).
+   * @param callback (Response, Boolean)=>Unit callback with 
+   *                 second parameter 'true' if there was an error.
    * @return a future that handles the response.
    */
-  def query (query: String): Future[Response] = {
-    post("/db/data/cypher", s"""{"query": "$query"}""")
+  def query (query: String, callback: (Response, Boolean)=>Unit): Unit = {
+    post("/db/data/cypher", Json.obj("query" -> query), callback)   
   }
 
 }

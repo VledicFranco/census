@@ -8,7 +8,7 @@ import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import compute.MultiNodeRequest
-import controllers.N4j
+import controllers.Neo4j
 import controllers.HTTPHook
 import controllers.requests.ComputationRequest
 import instances.Orchestrator
@@ -55,7 +55,7 @@ class BrandesBetweennessMN (val requester: ComputationRequest) extends MultiNode
       res => validateJson(res.json)
     } recover {
       // Report: Neo4j server unreachable.
-      case _ => HTTPHook.Error.unreachableN4j(requester)
+      case _ => HTTPHook.Error.unreachableNeo4j(requester)
     }
   }
 
@@ -74,12 +74,12 @@ class BrandesBetweennessMN (val requester: ComputationRequest) extends MultiNode
         // Clear database from censusimport attributes.
         else requester.database.query(s"MATCH (n:${requester.database.tag} {censuscheckbrandesbetweenness:true}) REMOVE n.censuscheckbrandesbetweenness") recover {
           // Report: Neo4j server unreachable.
-          case _ => HTTPHook.Error.unreachableN4j(requester)
+          case _ => HTTPHook.Error.unreachableNeo4j(requester)
         }
         // FINISHED
       case None => 
         // Report: Invalid Neo4j graph format.
-        HTTPHook.Error.invalidN4jFormat(requester)
+        HTTPHook.Error.invalidNeo4jFormat(requester)
     }
   }
 

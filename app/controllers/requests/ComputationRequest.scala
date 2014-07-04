@@ -11,7 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 
 import instances.conf
 import controllers.HTTPHook
-import controllers.N4j
+import controllers.Neo4j
 import compute.Library
 import compute.Receiver
 
@@ -57,7 +57,7 @@ class ComputationRequest (json: JsValue) extends Request {
   var tag: String = null
 
   /** Neo4j database that will be used for the node importation. */
-  var database: N4j = null
+  var database: Neo4j = null
 
   /** Neo4j database host. */
   var n4jhost: String = null
@@ -115,7 +115,7 @@ class ComputationRequest (json: JsValue) extends Request {
    * Request execution.
    */
   def start: Unit = {
-    database = new N4j
+    database = new Neo4j
     database.tag = tag
     database.setHost(n4jhost, n4jport)
     database.setAuth(n4juser, n4jpassword)
@@ -125,7 +125,7 @@ class ComputationRequest (json: JsValue) extends Request {
     } recover {
       case _ => 
         // Report: Neo4j server unreachable.
-        HTTPHook.Error.unreachableN4j(this)
+        HTTPHook.Error.unreachableNeo4j(this)
     }
   }
 

@@ -12,7 +12,7 @@ import scala.concurrent._
 import scala.collection.mutable.Queue
 
 import compute.Sender
-import controllers.N4j
+import controllers.Neo4j
 import controllers.requests.ComputationRequest
 
 /**
@@ -29,7 +29,7 @@ object Orchestrator {
    * @param database to be used to import the graph to the Census Engine services.
    * @param callback function to be executed after all the Census Engine services are ready.
    */
-  def apply (size: Int, algorithm: String, database: N4j, callback: Orchestrator=>Unit): Orchestrator = {
+  def apply (size: Int, algorithm: String, database: Neo4j, callback: Orchestrator=>Unit): Orchestrator = {
     val orchestrator = new Orchestrator(size, algorithm, database)
     orchestrator.initialize(callback)
     orchestrator
@@ -44,7 +44,7 @@ object Orchestrator {
  * @param algorithm to format the Census Engine services.
  * @param database to be used to import the graph to the Census Engine services.
  */
-class Orchestrator (val size: Int, val algorithm: String, val database: N4j) {
+class Orchestrator (val size: Int, val algorithm: String, val database: Neo4j) {
 
   /** Used to know if the requests are being processed. */
   private var isRunning: Boolean = false

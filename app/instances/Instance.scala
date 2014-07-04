@@ -11,7 +11,7 @@ import com.github.nscala_time.time.Imports._
 import play.api.libs.ws._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import controllers.N4j
+import controllers.Neo4j
 import controllers.WebService
 import controllers.InReports
 import compute.Sender
@@ -147,7 +147,7 @@ class Instance extends WebService {
    * @param database from which the graph will be imported.
    * @param callback function to be executed when the graph import is successful.
    */
-  def prepareForAlgorithm (algorithm: String, database: N4j, callback: ()=>Unit): Unit = {
+  def prepareForAlgorithm (algorithm: String, database: Neo4j, callback: ()=>Unit): Unit = {
     // Import graph.
     post("/graph", "{"
       +s""" "token": "${Utils.genUUID}", """

@@ -7,12 +7,8 @@ package controllers
 import com.github.nscala_time.time.Imports._
 
 import play.api.libs.json._
-import play.api.libs.ws._
-import play.api.libs.concurrent.Execution.Implicits._
 
-import scala.concurrent.Future
-
-import requests._
+import controllers.requests.ComputationRequest
 
 /** 
  * Module that handles the reports to an external web service
@@ -22,25 +18,26 @@ object HTTPHook extends WebService {
 
   def report (token: String): Unit = {
     if (host == "unset") return
-    post("/censuscontrol/report", "{"
-      +s""" "token": "$token", """
-      + """ "status": "success" """
-      + "}"
-    ) recover {
-      case _ => println(s"${DateTime.now} - WARNING: Unreachable HTTP hook server.")
-    }
+    val data = Json.obj(
+      "token" -> token,
+      "status" -> "success"
+    )
+    post("/censusengine/report", data, { (response, error) => 
+      if (error) println(s"${DateTime.now} - WARNING: Unreachable Census Control server.")
+    })
   }
 
-  def error (token: String, error: String): Unit = {
+  def error (token: String, error: String, on: String): Unit = {
     if (host == "unset") return
-    post("/censuscontrol/error", "{"
-      +s""" "token": "$token", """
-      + """ "status": "error", """
-      +s""" "error": "$error", """
-      + "}"
-    ) recover {
-      case _ => println(s"${DateTime.now} - WARNING: Unreachable HTTP hook server.")
-    }
+    val data = Json.obj(
+      "token" -> token,
+      "status" -> "error",
+      "error" -> error,
+      "on" -> on
+    )
+    post("/censusengine/error", data, { (response, error) => 
+      if (error) println(s"${DateTime.now} - WARNING: Unreachable Census Control server.")
+    })
   }
 
   /**
@@ -60,12 +57,12 @@ object HTTPHook extends WebService {
    */
   object Error {
     
-    def invalidN4jFormat (request: ComputationRequest): Unit = {
+    def invalidNeo4jFormat (request: ComputationRequest): Unit = {
       error(request.token, "invalid-neo4j-format")
       println(s"${DateTime.now} - ERROR: Invalid Neo4j format.") 
     }
 
-    def unreachableN4j (request: ComputationRequest): Unit = {
+    def unreachableNeo4j (request: ComputationRequest): Unit = {
       error(request.token, "unreachable-neo4j")
       println(s"${DateTime.now} - ERROR: Unreachable Neo4j server.")
     }

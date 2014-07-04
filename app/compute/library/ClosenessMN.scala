@@ -8,7 +8,7 @@ import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import compute.MultiNodeRequest
-import controllers.N4j
+import controllers.Neo4j
 import controllers.HTTPHook
 import controllers.requests.ComputationRequest
 import instances.Orchestrator
@@ -56,7 +56,7 @@ class ClosenessMN (val requester: ComputationRequest) extends MultiNodeRequest {
       res => validateJson(res.json)
     } recover {
       // Report: Neo4j server unreachable.
-      case _ => HTTPHook.Error.unreachableN4j(requester)
+      case _ => HTTPHook.Error.unreachableNeo4j(requester)
     }
   }
 
@@ -75,12 +75,12 @@ class ClosenessMN (val requester: ComputationRequest) extends MultiNodeRequest {
         // Clear database from censusimport attributes.
         else requester.database.query(s"MATCH (n:${requester.database.tag} {censuscheck:true}) REMOVE n.censuscheck") recover {
           // Report: Neo4j server unreachable.
-          case _ => HTTPHook.Error.unreachableN4j(requester)
+          case _ => HTTPHook.Error.unreachableNeo4j(requester)
         }
         // FINISHED
       case None => 
         // Report: Invalid Neo4j graph format.
-        HTTPHook.Error.invalidN4jFormat(requester)
+        HTTPHook.Error.invalidNeo4jFormat(requester)
     }
   }
 

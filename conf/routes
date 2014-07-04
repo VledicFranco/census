@@ -2,6 +2,8 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+# Control 
+
 GET  /             controllers.InRequests.index
 GET  /test         controllers.InRequests.test
 GET  /hook         controllers.InRequests.getHTTPHook
@@ -13,3 +15,11 @@ POST /censusengine/report controllers.InReports.report
 POST /censusengine/error  controllers.InReports.error
 
 GET  /assets/*file controllers.Assets.at(path="/public", file)
+
+# Engine
+
+GET /             controllers.InRequests.index
+GET /control      controllers.InRequests.getControl
+POST /control     controllers.InRequests.postControl
+POST /graph       controllers.InRequests.postGraph
+POST /compute     controllers.InRequests.postCompute

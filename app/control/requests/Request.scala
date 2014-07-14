@@ -6,7 +6,7 @@ package controllers.requests
 
 import play.api.libs.json._
 
-import utils.Utils
+import shared.Utils
 
 /**
  * An in request to be validated.

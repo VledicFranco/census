@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package instances
+package control 
 
 import scala.concurrent.Future
 
@@ -12,7 +12,7 @@ import play.api.libs.ws._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import utils.Utils
+import shared.Utils
 
 /**
  * Module that handles the GCE http api.

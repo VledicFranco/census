@@ -2,13 +2,13 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package compute
+package control 
 
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import controllers.requests.ComputationRequest
-import utils.Utils
+import control.requests.ComputationRequest
+import shared.Utils
 
 /**
  * Main trait that abstracts the attributes of a

@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres _ atfm05@gmail.com
  */
 
-package instances
+package control
 
 /**
  * Default configuration for the GCE flow.

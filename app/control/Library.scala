@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package compute
+package control
 
 import compute.library._
 import controllers.requests.ComputationRequest

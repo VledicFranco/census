@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package instances
+package control
 
 import scala.concurrent._
 
@@ -15,7 +15,7 @@ import controllers.Neo4j
 import controllers.WebService
 import controllers.InReports
 import compute.Sender
-import utils.Utils
+import shared.Utils
 
 /**
  * Enumerator used to set instance's status.

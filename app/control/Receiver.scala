@@ -6,7 +6,7 @@ package control
 
 /**
  * Interface for EngineRequests that are initiated by the
- * ComputationRequest.
+ * ComputeRequest.
  *
  * NOTE: The Receiver and Sender interfaces are designed so that
  * MultiNodeRequests and SingleGraphRequests are implementable.
@@ -14,7 +14,7 @@ package control
 trait Receiver {
 
   /**
-   * Called by a ComputationRequest to initiate an 
+   * Called by a ComputeRequest to initiate an 
    * EngineRequest.
    */
   def receive: Unit

@@ -18,7 +18,7 @@ import compute.Receiver
 /**
  * Companion object to correctly build the request.
  */
-object ComputationRequest {
+object ComputeRequest {
 
   /**
    * Constructor that creates the request, and executes
@@ -27,8 +27,8 @@ object ComputationRequest {
    * @param json of the request.
    * @return a request instance.
    */
-  def apply (json: JsValue): ComputationRequest = {
-    val req = new ComputationRequest(json)
+  def apply (json: JsValue): ComputeRequest = {
+    val req = new ComputeRequest(json)
     req.validate
     req.execute
     req
@@ -42,7 +42,7 @@ object ComputationRequest {
  *
  * @param json of the request.
  */
-class ComputationRequest (json: JsValue) extends Request {
+class ComputeRequest (json: JsValue) extends Request {
 
   /** Algorithm to be executed. */
   var algorithm: Receiver = null

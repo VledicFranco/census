@@ -8,7 +8,7 @@ import com.github.nscala_time.time.Imports._
 
 import play.api.libs.json._
 
-import controllers.requests.ComputationRequest
+import control.requests.ComputeRequest
 
 /** 
  * Module that handles the reports to an external web service
@@ -45,7 +45,7 @@ object HTTPHook extends WebService {
    */
   object Report {
   
-    def computationFinished (request: ComputationRequest): Unit = {
+    def computationFinished (request: ComputeRequest): Unit = {
       report(request.token)
       println(s"${DateTime.now} - REPORT: Computation with token:${request.token} finished in: ${request.computationTime} ms.")
     }
@@ -57,12 +57,12 @@ object HTTPHook extends WebService {
    */
   object Error {
     
-    def invalidNeo4jFormat (request: ComputationRequest): Unit = {
+    def invalidNeo4jFormat (request: ComputeRequest): Unit = {
       error(request.token, "invalid-neo4j-format")
       println(s"${DateTime.now} - ERROR: Invalid Neo4j format.") 
     }
 
-    def unreachableNeo4j (request: ComputationRequest): Unit = {
+    def unreachableNeo4j (request: ComputeRequest): Unit = {
       error(request.token, "unreachable-neo4j")
       println(s"${DateTime.now} - ERROR: Unreachable Neo4j server.")
     }

@@ -5,7 +5,7 @@
 package control
 
 import compute.library._
-import controllers.requests.ComputationRequest
+import control.requests.ComputeRequest
 
 /**
  * All the implemented graph algorithms must be registered in
@@ -20,7 +20,7 @@ object Library {
    * @return the object module of the corresponding algorithm.
    *         'None' if there was no matching algorithm.
    */
-  def apply (algorithm: String, request: ComputationRequest): Option[Receiver] = {
+  def apply (algorithm: String, request: ComputeRequest): Option[Receiver] = {
     algorithm match {
       case "Closeness" => Some(new ClosenessMN(request))
       case "Betweenness" => Some(new BrandesBetweennessMN(request))

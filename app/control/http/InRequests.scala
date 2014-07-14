@@ -9,8 +9,8 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import controllers.requests.SetHTTPHookRequest
-import controllers.requests.ComputationRequest
+import control.requests.SetHTTPHookRequest
+import control.requests.ComputeRequest
 
 import instances.Orchestrator
 import instances.Instance
@@ -57,7 +57,7 @@ object InRequests extends Controller {
 
   /** Route: POST /compute */ 
   def postCompute = Action(parse.json) { implicit request =>
-    val r = ComputationRequest(request.body)
+    val r = ComputeRequest(request.body)
     if (r.hasErrors)
       BadRequest(r.errorsToJson)
     else {

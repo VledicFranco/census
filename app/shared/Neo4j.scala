@@ -6,6 +6,8 @@ package controllers
 
 import play.api.libs.ws.Response
 
+object DB extends Neo4j
+
 /**
  * Class that handles the Neo4j http queries.
  */

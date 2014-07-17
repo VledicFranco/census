@@ -49,7 +49,7 @@ class SetOutReportsRequest (val json: JsValue) extends Request {
   def validate: Unit = {
     (json \ "host").asOpt[String] match {
       case None => errors = errors :+ "'host' field missing."
-      case Some(data) => host = data
+      case Some(data) => host = data replaceAll ("http://", "")
     }
     (json \ "port").asOpt[Int] match {
       case None => errors = errors :+ "'port' field missing."

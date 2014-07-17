@@ -102,7 +102,7 @@ class Instance extends WebService {
    */
   private def initializeWithHost (h: String, i: String, callback: Instance=>Unit): Unit = {
     ip = i
-    setHost(h, conf.census_engine_port)
+    setHost(h, conf.census_port)
     setCensusControlCommunication(callback)
   }
 
@@ -118,7 +118,7 @@ class Instance extends WebService {
       println(s"${DateTime.now} - INFO: Census engine service $host ready.")
       post("/control", "{"
         +s""" "host": "${conf.census_control_host}", """
-        +s""" "port": ${conf.census_control_port} """
+        +s""" "port": ${conf.census_port} """
         + "}"
       ) map { res => 
         status = InstanceStatus.IDLE

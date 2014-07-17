@@ -9,11 +9,9 @@ package control
  */
 object conf {
 
-  val project_id: String = "vidtecci-cloud"
+  val project_id: String = ""
 
   val zone: String = "us-central1-a"
-
-  val census_engine_port: Int = 9000
 
   val census_engine_machine_type: String = "n1-highcpu-8"
 
@@ -23,10 +21,6 @@ object conf {
 
   val census_control_host: String = "census-control"
 
-  val census_control_port: Int = 9595
-
-  val min_instances: Int = 5
-
-  val ce_max_queue_size: Int = 5
+  val census_port: Int = 9595
 
 }

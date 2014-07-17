@@ -2,10 +2,10 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package compute
+package engine
 
-import controllers.OutReports
-import controllers.requests.EngineComputeRequest
+import http.OutReports
+import requests.EngineComputeRequest
 
 /**
  * This trait has the interfaces and functionality needed for

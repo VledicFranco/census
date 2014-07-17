@@ -2,15 +2,15 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package compute
+package engine
 
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.Map
 
 import com.signalcollect._
 
-import controllers.OutReports
-import controllers.requests.EngineImportRequest
+import http.OutReports
+import requests.EngineImportRequest
 
 /**
  * This trait has the interfaces and functionality needed for
@@ -35,7 +35,7 @@ trait GraphImport extends GraphCompute {
   def importExecute (importRequest: EngineImportRequest): Unit 
 
   /**
-   * Used by a EngineImportRequest to start the Neo4j graph
+   * Used by a EngineImportRequest to start the DB graph
    * importation.
    *
    * @param importRequest for this import.

@@ -12,6 +12,7 @@ import control.conf
 import shared.Neo4j
 import library.Library
 import control.Receiver
+import http.OutReports
 
 /**
  * Companion object to correctly build the request.
@@ -119,14 +120,10 @@ class ControlComputeRequest (json: JsValue) extends Request {
     database.port = n4jport
     database.user = n4juser
     database.password = n4jpassword
-    // Check for server connectivity.
-    database.ping map { response => 
+    database.ping { success => 
+      if (!success) return OutReports.Error.unreachableNeo4j(this)
       algorithm.receive
-    } recover {
-      case _ => 
-        // Report: Neo4j server unreachable.
-        HTTPHook.Error.unreachableNeo4j(this)
-    }
+    } 
   }
 
 }

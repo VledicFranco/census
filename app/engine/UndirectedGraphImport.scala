@@ -2,17 +2,18 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package compute
+package engine
 
 import scala.collection.mutable.ArrayBuffer
 
 import com.signalcollect._
 
-import controllers.{Neo4j, OutReports}
-import controllers.requests.EngineImportRequest
+import shared.DB
+import http.OutReports
+import requests.EngineImportRequest
 
 /**
- * Used to import the basic topology of a Neo4j graph.
+ * Used to import the basic topology of a DB graph.
  */
 trait UndirectedGraphImport extends GraphImport {
 
@@ -35,7 +36,7 @@ trait UndirectedGraphImport extends GraphImport {
   def edge (target: Any): Edge[Any]
 
   /** 
-   * Queries Neo4j for a batch of 1000 vertices and it's
+   * Queries DB for a batch of 1000 vertices and it's
    * relationships.
    */
   def importExecute (importRequest: EngineImportRequest): Unit = {
@@ -47,7 +48,7 @@ trait UndirectedGraphImport extends GraphImport {
       +s"MATCH (a)--(b:${importRequest.tag}) "
       +s"SET a.$importId=true "
       + "RETURN a.id, b.id")
-    Neo4j.query(batchQuery, { (response, error) =>
+    DB.query(batchQuery, { (response, error) =>
       if (error) {
         clearDatabase(importRequest)
         importFinish(importRequest, false)
@@ -87,8 +88,8 @@ trait UndirectedGraphImport extends GraphImport {
     val clearQuery = (
       s"MATCH (a:${importRequest.tag} {$importId:true}) "
      +s"REMOVE a.$importId")
-    Neo4j.query(clearQuery, { (response, error) =>
-      if (error) OutReports.Error.unreachableNeo4j(importRequest)
+    DB.query(clearQuery, { (response, error) =>
+      if (error) OutReports.Error.unreachableDB(importRequest)
     })
   }
 

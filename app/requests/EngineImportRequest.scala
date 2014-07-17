@@ -2,12 +2,14 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package controllers.requests
+package requests
 
 import play.api.libs.json._
 
-import compute.{Library, GraphImport}
-import controllers.{Neo4j, OutReports}
+import library.Library
+import engine.GraphImport
+import shared.DB
+import http.OutReports
 
 /**
  * Companion object to correctly build the request.
@@ -31,7 +33,7 @@ object EngineImportRequest {
 
 /**
  * An in queue request that imports a graph
- * from Neo4j with an algorithm format.
+ * from DB with an algorithm format.
  *
  * @param json of the request.
  */
@@ -46,16 +48,16 @@ class EngineImportRequest (json: JsValue) extends QueueRequest {
   /** Extra cypher to be used for the graph importation. */
   var tag: String = null
 
-  /** The Neo4j server hostname. */
+  /** The DB server hostname. */
   var host: String = null
 
-  /** The Neo4j server port. */
+  /** The DB server port. */
   var port: Int = 0
 
-  /** The Neo4j server username. */
+  /** The DB server username. */
   var user: String = null
 
-  /** The Neo4j server password. */
+  /** The DB server password. */
   var password: String = null
 
   /** The amount of milliseconds which the graph took to be imported. */
@@ -102,11 +104,11 @@ class EngineImportRequest (json: JsValue) extends QueueRequest {
    * Request execution.
    */
   def execute: Unit = {
-    Neo4j.host = host
-    Neo4j.port = port
-    Neo4j.user = user
-    Neo4j.password = password
-    Neo4j.ping { success =>  
+    DB.host = host
+    DB.port = port
+    DB.user = user
+    DB.password = password
+    DB.ping { success =>  
       if (!success) {
         OutReports.Error.unreachableNeo4j(this)
         // Note: At this point the algorithm 
@@ -114,9 +116,9 @@ class EngineImportRequest (json: JsValue) extends QueueRequest {
         finish()
         return
       }
-      if (Neo4j.importedGraphFormat != null) 
-        Neo4j.importedGraphFormat.clear
-      Neo4j.importedGraphFormat = graph
+      if (DB.importedGraphFormat != null) 
+        DB.importedGraphFormat.clear
+      DB.importedGraphFormat = graph
       graph.importStart(this)
     }
   }

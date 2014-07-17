@@ -6,7 +6,7 @@ package controllers.requests
 
 import play.api.libs.json._
 
-import controllers.OutReports
+import http.OutReports
 
 /**
  * Companion object to correctly build the request.

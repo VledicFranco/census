@@ -9,7 +9,7 @@ import com.github.nscala_time.time.Imports._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import controllers.HTTPHook
+import http.HTTPHook
 
 /**
  * Trait used for all pair graph algorithms, called by a 

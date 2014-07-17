@@ -9,8 +9,10 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import control.requests.ControlComputeRequest
-import controllers.requests.{SetOutReportsRequest, EngineImportRequest, EngineComputeRequest}
+import requests.ControlComputeRequest
+import requests.EngineComputeRequest
+import requests.EngineImportRequest
+import requests.SetOutReportsRequest
 
 import control.Orchestrator
 import control.Instance
@@ -20,7 +22,7 @@ import control.Instance
  * requests.
  */
 object InRequests extends Controller {
-  
+
   /** Route: GET / */ 
   def index = Action {
     Ok("Hello I am Census, how can I serve you?")
@@ -33,35 +35,32 @@ object InRequests extends Controller {
 
   /** Route: POST /reports */ 
   def reportsservice = Action(parse.json) { implicit request =>
-    val r = SetOutReportsRequest(request.body)
-    if (r.hasValidationErrors)
-      BadRequest(r.errorsToJson)
+    val req = new SetOutReportsRequest(request.body)
+    if (req.hasErrors)
+      BadRequest(req.errorsToJson)
     else
       Ok(Json.obj("status" -> "success"))
   }
 
   /** Route: POST /control/compute */ 
   def controlcompute = Action(parse.json) { implicit request =>
-    val r = ControlComputeRequest(request.body)
-    if (r.hasErrors)
-      BadRequest(r.errorsToJson)
-    else {
+    val req = new ControlComputeRequest(request.body)
+    if (req.hasErrors)
+      BadRequest(req.errorsToJson)
+    else
       Ok(Json.obj(
         "status" -> "acknowledged",
-        "token" -> r.token
+        "token" -> req.token
       ))
-    }
   }
-  
+
   /** Route: POST /engine/import */ 
   def engineimport = Action(parse.json) { implicit request =>
-    val r = EngineImportRequest(request.body)
-    if (r.hasValidationErrors)
-      BadRequest(r.errorsToJson)
-    else {
-      RequestsQueue.enqueue(r)
+    val req = EngineImportRequest(request.body)
+    if (req.hasErrors)
+      BadRequest(req.errorsToJson)
+    else
       Ok(Json.obj("status" -> "acknowledged"))
-    }
   }
 
   /** Route: POST /engine/compute */ 
@@ -69,10 +68,8 @@ object InRequests extends Controller {
     val r = EngineComputeRequest(request.body)
     if (r.hasValidationErrors)
       BadRequest(r.errorsToJson)
-    else {
-      RequestsQueue.enqueue(r)
+    else
       Ok(Json.obj("status" -> "acknowledged"))
-    }
   }
 
 }

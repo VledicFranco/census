@@ -14,7 +14,7 @@ import http.OutReports
  *
  * @param json of the request.
  */
-class SetOutReportsRequest (val json: JsValue) extends Request {
+class SetOutReportsRequest (json: JsValue) extends Request {
 
   /** The Census Control hostname. */
   var host: String = null

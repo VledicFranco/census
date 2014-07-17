@@ -6,10 +6,10 @@ package requests
 
 import play.api.libs.json._
 
+import http.OutReports
 import library.Library
 import engine.GraphImport
-import shared.DB
-import http.OutReports
+import engine.DB
 
 /**
  * An in queue request that imports a graph
@@ -86,11 +86,7 @@ class EngineImportRequest (json: JsValue) extends Request {
     DB.user = user
     DB.password = password
     DB.ping { success =>  
-      if (!success) {
-        OutReports.Error.unreachableNeo4j(this)
-        finish()
-        return
-      }
+      if (!success) return OutReports.Error.unreachableNeo4j(this)
       if (DB.importedGraphFormat != null) 
         DB.importedGraphFormat.clear
       DB.importedGraphFormat = graph

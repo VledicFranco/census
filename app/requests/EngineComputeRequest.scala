@@ -2,11 +2,12 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package controllers.requests
+package requests
 
 import play.api.libs.json._
 
-import compute.{Library, GraphCompute}
+import library.Library
+import engine.GraphCompute
 
 /**
  * An in queue request that executes a

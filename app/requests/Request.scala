@@ -23,22 +23,20 @@ trait Request {
   /** Array used to store all the validation errors. */
   var errors: Array[String] = Array()
 
+  /**
+   * Request execution.
+   */
+  def body: Unit
+
   /** 
    * Called to check if the json of the request is valid.
    */
   def validate: Unit
 
   /**
-   * Request execution.
-   */
-  def body: Unit
-
-  /**
    * Invoked by the object companions to start the request.
    */
-  def execute: Unit = {
-    if (!hasErrors) body
-  }
+  def execute: Unit = if (!hasErrors) body
 
   /**
    * Checks if there were any errors on the validation stage.
@@ -46,9 +44,7 @@ trait Request {
    * @return 'true' if there were errors.
    *         'false' if there were no errors.
    */
-  def hasErrors: Boolean = {
-    errors.length > 0
-  }
+  def hasErrors: Boolean = errors.length > 0
 
   /**
    * Converts all the errors to a json error report.

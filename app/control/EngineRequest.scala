@@ -7,7 +7,7 @@ package control
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import control.requests.ComputeRequest
+import control.requests.ControlComputeRequest
 import shared.Utils
 
 /**
@@ -24,7 +24,7 @@ trait EngineRequest {
    * responsible of creating this Census Engine
    * request.
    */
-  val requester: ComputeRequest
+  val requester: ControlComputeRequest
 
   /** State flag that marks if this request was completed. */
   var completed: Boolean = false

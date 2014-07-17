@@ -9,16 +9,16 @@ import scala.concurrent._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import instances.conf
-import controllers.HTTPHook
+import control.conf
+import control.http.HTTPHook
 import shared.Neo4j
-import compute.Library
-import compute.Receiver
+import control.Library
+import control.Receiver
 
 /**
  * Companion object to correctly build the request.
  */
-object ComputeRequest {
+object ControlComputeRequest {
 
   /**
    * Constructor that creates the request, and executes
@@ -27,8 +27,8 @@ object ComputeRequest {
    * @param json of the request.
    * @return a request instance.
    */
-  def apply (json: JsValue): ComputeRequest = {
-    val req = new ComputeRequest(json)
+  def apply (json: JsValue): ControlComputeRequest = {
+    val req = new ControlComputeRequest(json)
     req.validate
     req.execute
     req
@@ -42,7 +42,7 @@ object ComputeRequest {
  *
  * @param json of the request.
  */
-class ComputeRequest (json: JsValue) extends Request {
+class ControlComputeRequest (json: JsValue) extends Request {
 
   /** Algorithm to be executed. */
   var algorithm: Receiver = null

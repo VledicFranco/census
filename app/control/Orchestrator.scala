@@ -12,7 +12,7 @@ import scala.concurrent._
 import scala.collection.mutable.Queue
 
 import shared.Neo4j
-import control.requests.ComputeRequest
+import control.requests.ControlComputeRequest
 
 /**
  * Companion object to create Orchestrators.

@@ -10,7 +10,7 @@ import com.github.nscala_time.time.Imports._
 
 import play.api.libs.json._
 
-import controllers.requests.{ImportRequest, ComputeRequest}
+import controllers.requests.{EngineImportRequest, EngineComputeRequest}
 
 /** 
  * Module that handles the reports to the Census Control
@@ -48,12 +48,12 @@ object OutReports extends WebService {
    */
   object Report {
   
-    def importFinished (request: ImportRequest): Unit = {
+    def importFinished (request: EngineImportRequest): Unit = {
       report(request.token)
       println(s"${DateTime.now} - REPORT: Graph import finished in: ${request.importTime} ms.")
     }
 
-    def computationFinished (request: ComputeRequest): Unit = {
+    def computationFinished (request: EngineComputeRequest): Unit = {
       report(request.token)
       println(s"${DateTime.now} - REPORT: Computation with token:${request.token} finished in: ${request.computationTime} ms.")
     }
@@ -67,29 +67,29 @@ object OutReports extends WebService {
     
     /** Graph import error reports: */
 
-    def unreachableNeo4j (request: ImportRequest): Unit = {
+    def unreachableNeo4j (request: EngineImportRequest): Unit = {
       error(request.token, "unreachable-neo4j", "graph-import")
       println(s"${DateTime.now} - ERROR: Unreachable Neo4j server on graph import.")
     }
 
-    def importFailed (request: ImportRequest): Unit = {
+    def importFailed (request: EngineImportRequest): Unit = {
       error(request.token, "import-failed", "graph-import")
       println(s"${DateTime.now} - ERROR: Graph import failed.") 
     }
 
     /** Computation error reports: */
 
-    def unreachableNeo4j (request: ComputeRequest): Unit = {
+    def unreachableNeo4j (request: EngineComputeRequest): Unit = {
       error(request.token, "unreachable-neo4j", "compute")
       println(s"${DateTime.now} - ERROR: Unreachable Neo4j server on compute.")
     }
 
-    def computationFailed (request: ComputeRequest): Unit = {
+    def computationFailed (request: EngineComputeRequest): Unit = {
       error(request.token, "computation-failed", "compute")
       println(s"${DateTime.now} - ERROR: Computation failed.")
     }
 
-    def computationNotReady (request: ComputeRequest): Unit = {
+    def computationNotReady (request: EngineComputeRequest): Unit = {
       error(request.token, "missing-graph", "compute")
       println(s"${DateTime.now} - ERROR: Couldn't start computation, the graph was not properly imported.")
     }

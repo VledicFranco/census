@@ -5,7 +5,7 @@
 package compute
 
 import controllers.OutReports
-import controllers.requests.ComputeRequest
+import controllers.requests.EngineComputeRequest
 
 /**
  * This trait has the interfaces and functionality needed for
@@ -30,15 +30,15 @@ trait GraphCompute {
    * @param computationRequest for this execution.
    * @param variables received for this execution.
    */
-  def computeExecute (computationRequest: ComputeRequest, variables: Array[String]): Unit
+  def computeExecute (computationRequest: EngineComputeRequest, variables: Array[String]): Unit
 
   /** 
-   * Used by a ComputeRequest to start the algorithm.
+   * Used by a EngineComputeRequest to start the algorithm.
    *
    * @param computationRequest for this execution.
    * @param variables received for this execution.
    */
-  def computeStart (computationRequest: ComputeRequest, variables: Array[String]): Unit = {
+  def computeStart (computationRequest: EngineComputeRequest, variables: Array[String]): Unit = {
     if (!computationReady) {
       OutReports.Error.computationNotReady(computationRequest)
       computationRequest.finish()
@@ -57,7 +57,7 @@ trait GraphCompute {
    * @param computationRequest for this execution.
    * @param success 'true' if the computation was successful.
    */
-  def computeFinish (computationRequest: ComputeRequest, success: Boolean): Unit = {
+  def computeFinish (computationRequest: EngineComputeRequest, success: Boolean): Unit = {
     computationRequest.computationTime = System.currentTimeMillis - computationRequest.computationTime
     if (success) OutReports.Report.computationFinished(computationRequest)
     else OutReports.Error.computationFailed(computationRequest)

@@ -10,17 +10,17 @@ import play.api.libs.concurrent.Execution.Implicits._
 import compute.MultiNodeRequest
 import shared.Neo4j
 import controllers.HTTPHook
-import control.requests.ComputeRequest
+import control.requests.ControlComputeRequest
 import instances.Orchestrator
 import instances.Instance
 
 /**
  * MultiNodeRequest implementation for Freeman's Closeness.
  */
-class BrandesBetweennessMN (val requester: ComputeRequest) extends MultiNodeRequest {
+class BrandesBetweennessMN (val requester: ControlComputeRequest) extends MultiNodeRequest {
   
   /**
-   * Called by the ComputeRequest to initiate this
+   * Called by the ControlComputeRequest to initiate this
    * EngineRequest. Creates an orchestrator formated for the computation of
    * Single Source Closeness algorithms.
    */

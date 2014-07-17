@@ -11,13 +11,13 @@ import play.api.libs.concurrent.Execution.Implicits._
 
 import compute.SingleNodeRequest
 import compute.MultiNodeRequest
-import control.requests.ComputeRequest
+import control.requests.ControlComputeRequest
 import instances.Instance
 
 /**
  * SingleNodeRequest implementation for the Freeman's Closeness.
  */
-class BrandesBetweennessSN (val source: String, val parent: MultiNodeRequest, val requester: ComputeRequest) extends SingleNodeRequest {
+class BrandesBetweennessSN (val source: String, val parent: MultiNodeRequest, val requester: ControlComputeRequest) extends SingleNodeRequest {
 
   /** 
    * Invoked by the instance when the request enters it's queue.

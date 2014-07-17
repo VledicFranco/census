@@ -9,7 +9,7 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import controllers.requests.{SetOutReportsRequest, ImportRequest, ComputeRequest}
+import controllers.requests.{SetOutReportsRequest, EngineImportRequest, EngineComputeRequest}
 
 import com.signalcollect._
 
@@ -43,7 +43,7 @@ object InRequests extends Controller {
 
   /** Route: POST /graph */ 
   def postGraph = Action(parse.json) { implicit request =>
-    val r = ImportRequest(request.body)
+    val r = EngineImportRequest(request.body)
     if (r.hasValidationErrors)
       BadRequest(r.errorsToJson)
     else {
@@ -54,7 +54,7 @@ object InRequests extends Controller {
 
   /** Route: POST /compute */ 
   def postCompute = Action(parse.json) { implicit request =>
-    val r = ComputeRequest(request.body)
+    val r = EngineComputeRequest(request.body)
     if (r.hasValidationErrors)
       BadRequest(r.errorsToJson)
     else {

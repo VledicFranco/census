@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package controllers
+package control.http
 
 import scala.collection.mutable.HashMap
 

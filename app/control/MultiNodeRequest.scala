@@ -13,7 +13,7 @@ import controllers.HTTPHook
 
 /**
  * Trait used for all pair graph algorithms, called by a 
- * ComputeRequest and then creates multiple SingleNodeRequests 
+ * ControlComputeRequest and then creates multiple SingleNodeRequests 
  * that will be sent to Census Engine instances.
  */
 trait MultiNodeRequest extends EngineRequest with Receiver {

@@ -10,7 +10,7 @@ import scala.collection.mutable.Map
 import com.signalcollect._
 
 import controllers.OutReports
-import controllers.requests.ImportRequest
+import controllers.requests.EngineImportRequest
 
 /**
  * This trait has the interfaces and functionality needed for
@@ -32,15 +32,15 @@ trait GraphImport extends GraphCompute {
    *
    * @param importRequest for this import.
    */
-  def importExecute (importRequest: ImportRequest): Unit 
+  def importExecute (importRequest: EngineImportRequest): Unit 
 
   /**
-   * Used by a ImportRequest to start the Neo4j graph
+   * Used by a EngineImportRequest to start the Neo4j graph
    * importation.
    *
    * @param importRequest for this import.
    */
-  def importStart (importRequest: ImportRequest): Unit = {
+  def importStart (importRequest: EngineImportRequest): Unit = {
     importRequest.importTime = System.currentTimeMillis
     importExecute(importRequest)
   }
@@ -52,7 +52,7 @@ trait GraphImport extends GraphCompute {
    * @param importRequest for this import.
    * @param success 'true' if the importation was successful.
    */
-  def importFinish (importRequest: ImportRequest, successful: Boolean): Unit = {
+  def importFinish (importRequest: EngineImportRequest, successful: Boolean): Unit = {
     importRequest.importTime = System.currentTimeMillis - importRequest.importTime
     if (successful) {
       OutReports.Report.importFinished(importRequest)

@@ -9,7 +9,7 @@ import scala.collection.mutable.ArrayBuffer
 import com.signalcollect._
 
 import controllers.{Neo4j, OutReports}
-import controllers.requests.ImportRequest
+import controllers.requests.EngineImportRequest
 
 /**
  * Used to import the basic topology of a Neo4j graph.
@@ -38,7 +38,7 @@ trait UndirectedGraphImport extends GraphImport {
    * Queries Neo4j for a batch of 1000 vertices and it's
    * relationships.
    */
-  def importExecute (importRequest: ImportRequest): Unit = {
+  def importExecute (importRequest: EngineImportRequest): Unit = {
     val importId = "census"+importRequest.token.split("-").last
     val batchQuery = (
        s"MATCH (a:${importRequest.tag}) "
@@ -82,7 +82,7 @@ trait UndirectedGraphImport extends GraphImport {
    *
    * @param importRequest used for this import.
    */
-  def clearDatabase (importRequest: ImportRequest): Unit = {
+  def clearDatabase (importRequest: EngineImportRequest): Unit = {
     val importId = "census"+importRequest.token.split("-").last
     val clearQuery = (
       s"MATCH (a:${importRequest.tag} {$importId:true}) "

@@ -12,7 +12,7 @@ import controllers.{Neo4j, OutReports}
 /**
  * Companion object to correctly build the request.
  */
-object ImportRequest {
+object EngineImportRequest {
 
   /**
    * Constructor that creates the request, and executes
@@ -21,8 +21,8 @@ object ImportRequest {
    * @param json of the request.
    * @return a request instance.
    */
-  def apply (json: JsValue): ImportRequest = {
-    val req = new ImportRequest(json)
+  def apply (json: JsValue): EngineImportRequest = {
+    val req = new EngineImportRequest(json)
     req.validate
     req
   }
@@ -35,7 +35,7 @@ object ImportRequest {
  *
  * @param json of the request.
  */
-class ImportRequest (json: JsValue) extends QueueRequest {
+class EngineImportRequest (json: JsValue) extends QueueRequest {
 
   /** Token to identify the request. */
   var token: String = null

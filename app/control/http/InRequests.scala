@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package controllers
+package control.http
 
 import play.api._
 import play.api.mvc._
@@ -10,10 +10,10 @@ import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import control.requests.SetHTTPHookRequest
-import control.requests.ComputeRequest
+import control.requests.ControlComputeRequest
 
-import instances.Orchestrator
-import instances.Instance
+import control.Orchestrator
+import control.Instance
 
 /**
  * Module that handles the Play Framework HTTP main Census Control
@@ -57,7 +57,7 @@ object InRequests extends Controller {
 
   /** Route: POST /compute */ 
   def postCompute = Action(parse.json) { implicit request =>
-    val r = ComputeRequest(request.body)
+    val r = ControlComputeRequest(request.body)
     if (r.hasErrors)
       BadRequest(r.errorsToJson)
     else {

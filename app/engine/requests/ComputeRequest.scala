@@ -11,7 +11,7 @@ import compute.{Library, GraphCompute}
 /**
  * Companion object to correctly build the request.
  */
-object ComputeRequest {
+object EngineComputeRequest {
 
   /**
    * Constructor that creates the request, and executes
@@ -20,8 +20,8 @@ object ComputeRequest {
    * @param json of the request.
    * @return a request instance.
    */
-  def apply (json: JsValue): ComputeRequest = {
-    val req = new ComputeRequest(json)
+  def apply (json: JsValue): EngineComputeRequest = {
+    val req = new EngineComputeRequest(json)
     req.validate
     req
   }
@@ -34,7 +34,7 @@ object ComputeRequest {
  *
  * @param json of the request.
  */
-class ComputeRequest (json: JsValue) extends QueueRequest {
+class EngineComputeRequest (json: JsValue) extends QueueRequest {
 
   /** Token to identify the request. */
   var token: String = null

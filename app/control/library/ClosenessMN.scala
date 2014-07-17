@@ -8,7 +8,7 @@ import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import compute.MultiNodeRequest
-import controllers.Neo4j
+import shared.Neo4j
 import controllers.HTTPHook
 import control.requests.ComputeRequest
 import instances.Orchestrator

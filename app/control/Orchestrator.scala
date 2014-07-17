@@ -11,8 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import scala.concurrent._
 import scala.collection.mutable.Queue
 
-import compute.Sender
-import controllers.Neo4j
+import shared.Neo4j
 import control.requests.ComputeRequest
 
 /**

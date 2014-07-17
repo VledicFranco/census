@@ -11,7 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 
 import instances.conf
 import controllers.HTTPHook
-import controllers.Neo4j
+import shared.Neo4j
 import compute.Library
 import compute.Receiver
 

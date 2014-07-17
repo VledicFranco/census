@@ -15,7 +15,7 @@ trait Request {
 
   /** A UUID string used to identify the request. */
   val token: String = Utils.genUUID
-  
+
   /** Array used to store all the validation errors. */
   var errors: Array[String] = Array()
 
@@ -27,15 +27,15 @@ trait Request {
   /**
    * Request execution.
    */
-  def start: Unit
+  def body: Unit
 
   /**
    * Invoked by the object companions to start the request.
    */
   def execute: Unit = {
-    if (!hasErrors) start
+    if (!hasErrors) body
   }
-  
+
   /**
    * Checks if there were any errors on the validation stage.
    *

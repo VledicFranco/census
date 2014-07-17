@@ -11,10 +11,9 @@ import com.github.nscala_time.time.Imports._
 import play.api.libs.ws._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import controllers.Neo4j
-import controllers.WebService
-import controllers.InReports
-import compute.Sender
+import shared.Neo4j
+import shared.WebService
+import control.http.InReports
 import shared.Utils
 
 /**

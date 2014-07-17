@@ -9,7 +9,7 @@ import com.github.nscala_time.time.Imports._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
-import http.HTTPHook
+import http.OutReports
 
 /**
  * Trait used for all pair graph algorithms, called by a 
@@ -35,7 +35,7 @@ trait MultiNodeRequest extends EngineRequest with Receiver {
   private def complete: Unit = {
     completed = true
     requester.computationTime = System.currentTimeMillis - creationTime
-    HTTPHook.Report.computationFinished(requester)
+    OutReports.Report.computationFinished(requester)
     orchestrator.delete { () =>
       println(s"${DateTime.now} - INFO: All instances deleted.")
     }

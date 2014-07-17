@@ -15,27 +15,6 @@ import control.Receiver
 import http.OutReports
 
 /**
- * Companion object to correctly build the request.
- */
-object ControlComputeRequest {
-
-  /**
-   * Constructor that creates the request, and executes
-   * the validation.
-   *
-   * @param json of the request.
-   * @return a request instance.
-   */
-  def apply (json: JsValue): ControlComputeRequest = {
-    val req = new ControlComputeRequest(json)
-    req.validate
-    req.execute
-    req
-  }
-
-}
-
-/**
  * An in queue request that executes a
  * graph algorithm in the library.
  *
@@ -113,7 +92,7 @@ class ControlComputeRequest (json: JsValue) extends Request {
   /**
    * Request execution.
    */
-  def start: Unit = {
+  def body: Unit = {
     database = new Neo4j
     database.tag = tag
     database.host = n4jhost

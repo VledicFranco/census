@@ -9,27 +9,6 @@ import play.api.libs.json._
 import http.OutReports
 
 /**
- * Companion object to correctly build the request.
- */
-object SetOutReportsRequest {
-
-  /**
-   * Constructor that creates the request, and executes
-   * the validation.
-   *
-   * @param json of the request.
-   * @return a request instance.
-   */
-  def apply (json: JsValue): SetOutReportsRequest = {
-    val req = new SetOutReportsRequest(json)
-    req.validate
-    req.execute
-    req
-  }
-
-}
-
-/**
  * An in simple request that registers
  * the Census Control server information.
  *
@@ -60,7 +39,7 @@ class SetOutReportsRequest (val json: JsValue) extends Request {
   /**
    * Request execution.
    */
-  def execute: Unit = {
+  def body: Unit = {
     OutReports.host = host
     OutReports.port = port
   }

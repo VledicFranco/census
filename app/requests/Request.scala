@@ -13,8 +13,12 @@ import shared.Utils
  */
 trait Request {
 
+  /** Request flow. */
+  validate
+  execute
+
   /** A UUID string used to identify the request. */
-  val token: String = Utils.genUUID
+  var token: String = Utils.genUUID
 
   /** Array used to store all the validation errors. */
   var errors: Array[String] = Array()

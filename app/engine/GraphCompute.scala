@@ -12,7 +12,7 @@ import requests.EngineComputeRequest
  * a graph algorithm computation process.
  */
 trait GraphCompute {
-  
+
   /** Changed to 'true' only if the graph was succesfully imported. */
   var computationReady: Boolean = false
 

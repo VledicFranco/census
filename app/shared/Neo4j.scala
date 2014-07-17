@@ -2,11 +2,9 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package controllers
+package shared
 
 import play.api.libs.ws.Response
-
-object DB extends Neo4j
 
 /**
  * Class that handles the Neo4j http queries.

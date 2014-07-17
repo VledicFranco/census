@@ -9,47 +9,18 @@ import play.api.libs.json._
 import compute.{Library, GraphCompute}
 
 /**
- * Companion object to correctly build the request.
- */
-object EngineComputeRequest {
-
-  /**
-   * Constructor that creates the request, and executes
-   * the validation.
-   *
-   * @param json of the request.
-   * @return a request instance.
-   */
-  def apply (json: JsValue): EngineComputeRequest = {
-    val req = new EngineComputeRequest(json)
-    req.validate
-    req
-  }
-
-}
-
-/**
  * An in queue request that executes a
  * graph algorithm in the library.
  *
  * @param json of the request.
  */
-class EngineComputeRequest (json: JsValue) extends QueueRequest {
-
-  /** Token to identify the request. */
-  var token: String = null
+class EngineComputeRequest (json: JsValue) extends Request {
 
   /** Algorithm to be executed. */
   var algorithm: GraphCompute = null
 
-  /** Moment when the request was created. */
-  var creationTime: Long = 0
-
   /** Variables that the algorithm will use for the computation. */
   var vars: Array[String] = null
-
-  /** The Signal Collect stats of the computation. */
-  var stats: String = null
 
   /** The amount of milliseconds that the computation took. */
   var computationTime: Long = 0
@@ -69,16 +40,12 @@ class EngineComputeRequest (json: JsValue) extends QueueRequest {
         case Some(algo) => algorithm = algo
       }
     }
-    (json \ "creationTime").asOpt[Long] match {
-      case None => errors = errors :+ "'creationTime' field missing."
-      case Some(data) => creationTime = data
-    }
     vars = (json \ "vars").as[Array[String]]
   }
 
   /**
    * Request execution.
    */
-  def execute: Unit = algorithm.computeStart(this, vars)
+  def body: Unit = algorithm.computeStart(this, vars)
 
 }

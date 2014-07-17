@@ -12,35 +12,12 @@ import shared.DB
 import http.OutReports
 
 /**
- * Companion object to correctly build the request.
- */
-object EngineImportRequest {
-
-  /**
-   * Constructor that creates the request, and executes
-   * the validation.
-   *
-   * @param json of the request.
-   * @return a request instance.
-   */
-  def apply (json: JsValue): EngineImportRequest = {
-    val req = new EngineImportRequest(json)
-    req.validate
-    req
-  }
-
-}
-
-/**
  * An in queue request that imports a graph
  * from DB with an algorithm format.
  *
  * @param json of the request.
  */
-class EngineImportRequest (json: JsValue) extends QueueRequest {
-
-  /** Token to identify the request. */
-  var token: String = null
+class EngineImportRequest (json: JsValue) extends Request {
 
   /** The algorithm that will format and import the graph. */
   var graph: GraphImport = null
@@ -103,7 +80,7 @@ class EngineImportRequest (json: JsValue) extends QueueRequest {
   /**
    * Request execution.
    */
-  def execute: Unit = {
+  def body: Unit = {
     DB.host = host
     DB.port = port
     DB.user = user
@@ -111,8 +88,6 @@ class EngineImportRequest (json: JsValue) extends QueueRequest {
     DB.ping { success =>  
       if (!success) {
         OutReports.Error.unreachableNeo4j(this)
-        // Note: At this point the algorithm 
-        // is not ready for computation.
         finish()
         return
       }

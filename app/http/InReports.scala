@@ -4,15 +4,13 @@
 
 package control.http
 
-import scala.collection.mutable.HashMap
-
-import com.github.nscala_time.time.Imports._ 
+import scala.collection.mutable.Map
 
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 
-import instances.Instance
+import control.Instance
 
 /**
  * Module that receives reports from the Census Engine instances.
@@ -20,7 +18,7 @@ import instances.Instance
 object InReports extends Controller {
 
   /** Map with all the Census Engine instances. */
-  private val listeners: HashMap[String, Instance] = HashMap()
+  private val listeners: Map[String, Instance] = Map()
 
   /**
    * Registers a new instance to the listeners Map.
@@ -40,28 +38,18 @@ object InReports extends Controller {
     listeners -= listener.ip
   }
   
-  /** Route: GET /test */ 
-  def test = Action { request => 
-    Ok(request.remoteAddress)
-  }
-  
-  /** Route: POST /censusengine/report */ 
+  /** Route: POST /census/report */ 
   def report = Action(parse.json) { implicit request =>
     val token = (request.body \ "token").as[String]
-    val host = request.remoteAddress
-    val listener = listeners.apply(host)
-    listener.report(token)
+    listeners.apply(request.remoteAddress).report(token)
     Ok
   }
 
-  /** Route: POST /censusengine/error */ 
+  /** Route: POST /census/error */ 
   def error = Action(parse.json) { implicit request =>
     val token = (request.body \ "token").as[String]
     val error = (request.body \ "error").as[String]
-    val on = (request.body \ "on").as[String]
-    val host = request.remoteAddress
-    val listener = listeners.apply(host)
-    listener.error(token, error, on)
+    listeners(request.remoteAddress).error(token, error)
     Ok
   }
 

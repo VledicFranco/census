@@ -10,7 +10,10 @@ import com.github.nscala_time.time.Imports._
 
 import play.api.libs.json._
 
-import controllers.requests.{EngineImportRequest, EngineComputeRequest}
+import requests.Request
+import requests.EngineImportRequest
+import requests.EngineComputeRequest
+import requests.ControlComputeRequest
 
 /** 
  * Module that handles the reports to the Census Control
@@ -25,20 +28,19 @@ object OutReports extends WebService {
       "token" -> token,
       "status" -> "success"
     )
-    post("/censusengine/report", data, { (response, error) => 
+    post("/census/report", data, { (response, error) => 
       if (error) println(s"${DateTime.now} - WARNING: Unreachable Census Control server.")
     })
   }
 
-  def error (token: String, error: String, on: String): Unit = {
+  def error (token: String, error: String): Unit = {
     if (host == "unset") return
     val data = Json.obj(
       "token" -> token,
       "status" -> "error",
-      "error" -> error,
-      "on" -> on
+      "error" -> error
     )
-    post("/censusengine/error", data, { (response, error) => 
+    post("/census/error", data, { (response, error) => 
       if (error) println(s"${DateTime.now} - WARNING: Unreachable Census Control server.")
     })
   }
@@ -48,12 +50,17 @@ object OutReports extends WebService {
    */
   object Report {
   
-    def importFinished (request: EngineImportRequest): Unit = {
+    def engineImportFinished (request: EngineImportRequest): Unit = {
       report(request.token)
       println(s"${DateTime.now} - REPORT: Graph import finished in: ${request.importTime} ms.")
     }
 
-    def computationFinished (request: EngineComputeRequest): Unit = {
+    def engineComputeFinished (request: EngineComputeRequest): Unit = {
+      report(request.token)
+      println(s"${DateTime.now} - REPORT: Computation with token:${request.token} finished in: ${request.computationTime} ms.")
+    }
+
+    def controlComputeFinished (request: ControlComputeRequest): Unit = {
       report(request.token)
       println(s"${DateTime.now} - REPORT: Computation with token:${request.token} finished in: ${request.computationTime} ms.")
     }
@@ -67,30 +74,25 @@ object OutReports extends WebService {
     
     /** Graph import error reports: */
 
-    def unreachableNeo4j (request: EngineImportRequest): Unit = {
-      error(request.token, "unreachable-neo4j", "graph-import")
+    def unreachableNeo4j (request: Request): Unit = {
+      error(request.token, "unreachable-neo4j")
       println(s"${DateTime.now} - ERROR: Unreachable Neo4j server on graph import.")
     }
 
-    def importFailed (request: EngineImportRequest): Unit = {
-      error(request.token, "import-failed", "graph-import")
+    def importFailed (request: Request): Unit = {
+      error(request.token, "import-failed")
       println(s"${DateTime.now} - ERROR: Graph import failed.") 
     }
 
     /** Computation error reports: */
 
-    def unreachableNeo4j (request: EngineComputeRequest): Unit = {
-      error(request.token, "unreachable-neo4j", "compute")
-      println(s"${DateTime.now} - ERROR: Unreachable Neo4j server on compute.")
-    }
-
-    def computationFailed (request: EngineComputeRequest): Unit = {
-      error(request.token, "computation-failed", "compute")
+    def computationFailed (request: Request): Unit = {
+      error(request.token, "computation-failed")
       println(s"${DateTime.now} - ERROR: Computation failed.")
     }
 
-    def computationNotReady (request: EngineComputeRequest): Unit = {
-      error(request.token, "missing-graph", "compute")
+    def computationNotReady (request: Request): Unit = {
+      error(request.token, "missing-graph")
       println(s"${DateTime.now} - ERROR: Couldn't start computation, the graph was not properly imported.")
     }
 

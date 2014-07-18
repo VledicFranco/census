@@ -23,7 +23,7 @@ trait GraphImport extends GraphCompute {
 
   /** The imported vertices. */
   val vertices: Map[Any, Vertex[Any, _]] = Map()
-  
+
   /** The imported edges map. (Source ID -> Edges) */
   val edges: Map[Any, ArrayBuffer[Edge[Any]]] = Map()
 

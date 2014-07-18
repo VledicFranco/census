@@ -4,6 +4,8 @@
 
 package requests
 
+import scala.concurrent.future
+import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json._
 
 import library.Library
@@ -47,6 +49,6 @@ class EngineComputeRequest (json: JsValue) extends Request {
   /**
    * Request execution.
    */
-  def body: Unit = algorithm.computeStart(this, vars)
+  def body: Unit = future {algorithm.computeStart(this, vars)}
 
 }

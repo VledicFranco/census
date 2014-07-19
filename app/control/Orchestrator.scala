@@ -4,8 +4,6 @@
 
 package control
 
-import com.github.nscala_time.time.Imports._ 
-
 import play.api.libs.concurrent.Execution.Implicits._
 
 import scala.concurrent._

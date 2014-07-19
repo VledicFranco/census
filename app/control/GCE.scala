@@ -6,13 +6,12 @@ package control
 
 import scala.concurrent.Future
 
-import com.github.nscala_time.time.Imports._ 
-
 import play.api.libs.ws._
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import shared.Utils
+import shared.Log
 
 /**
  * Module that handles the GCE http api.
@@ -76,9 +75,9 @@ object GCE {
    */
   private def createDiskRequest (diskName: String, callback: ()=>Unit): Unit = {  
     authorizedPost(s"$apiPrefixWithZone/disks", createDiskPayload(diskName), { response =>
-      println(s"${DateTime.now} - INFO: Creating $diskName.")
+      Log.info(s"Creating $diskName.")
       checkOperation((response.json \ "selfLink").as[String], { () =>
-        println(s"${DateTime.now} - INFO: $diskName created.")
+        Log.info(s"$diskName created.")
         callback()
       }) 
     }) 
@@ -93,9 +92,9 @@ object GCE {
    */
   private def createInstanceRequest (instanceName: String, diskName: String, callback: ()=>Unit): Unit = {
     authorizedPost(s"$apiPrefixWithZone/instances", createInstancePayload(instanceName, diskName), { response =>
-      println(s"${DateTime.now} - INFO: Creating $instanceName.")
+      Log.info(s"Creating $instanceName.")
       checkOperation((response.json \ "selfLink").as[String], { () =>
-        println(s"${DateTime.now} - INFO: $instanceName created.")
+        Log.info(s"$instanceName created.")
         callback()
       }) 
     })
@@ -109,9 +108,9 @@ object GCE {
    */
   private def deleteInstanceRequest (instanceName: String, callback: ()=>Unit): Unit = {
     authorizedDelete(s"$apiPrefixWithZone/instances/$instanceName", { response =>
-      println(s"${DateTime.now} - INFO: Deleting $instanceName.")
+      Log.info(s"Deleting $instanceName.")
       checkOperation((response.json \ "selfLink").as[String], { () =>
-        println(s"${DateTime.now} - INFO: $instanceName deleted.")
+        Log.info(s"$instanceName deleted.")
         callback()
       }) 
     })
@@ -150,7 +149,7 @@ object GCE {
         token_expiration = System.currentTimeMillis - 1000 + (response.json \ "expires_in").as[Long]
         callback(access_token)
       } recover {
-        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google metadata service.")
+        case _ => Log.error("Couldn't reach the Google metadata service.")
       }
   }
 
@@ -168,7 +167,7 @@ object GCE {
           validateAuthorizedRequest(url, response)
           callback(response)
       } recover {
-        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service.")
+        case _ => Log.error("Couldn't reach the Google Compute Engine service.")
       }
     } 
   }
@@ -187,7 +186,7 @@ object GCE {
           validateAuthorizedRequest(url, response)
           callback(response)
       } recover {
-        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service.")
+        case _ => Log.error("Couldn't reach the Google Compute Engine service.")
       }
     }    
   }
@@ -206,7 +205,7 @@ object GCE {
           validateAuthorizedRequest(url, response)
           callback(response)
       } recover {
-        case _ => println(s"${DateTime.now} - ERROR: Couldn't reach the Google Compute Engine service.")
+        case _ => Log.error("Couldn't reach the Google Compute Engine service.")
       }
     }
   }
@@ -219,7 +218,7 @@ object GCE {
    */
   private def validateAuthorizedRequest (url: String, response: Response): Unit = {
     if (response.status != 200) {
-      println(s"${DateTime.now} - ERROR: $url response status ${response.status}, printing json:")
+      Log.error(s"$url response status ${response.status}, printing json:")
       println(response.json)
     }
   }

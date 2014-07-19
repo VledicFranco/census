@@ -6,14 +6,13 @@ package controllers
 
 import scala.concurrent.Future
 
-import com.github.nscala_time.time.Imports._
-
 import play.api.libs.json._
 
 import requests.Request
 import requests.EngineImportRequest
 import requests.EngineComputeRequest
 import requests.ControlComputeRequest
+import shared.Log
 
 /** 
  * Module that handles the reports to the Census Control
@@ -29,7 +28,7 @@ object OutReports extends WebService {
       "status" -> "success"
     )
     post("/census/report", data, { (response, error) => 
-      if (error) println(s"${DateTime.now} - WARNING: Unreachable Census Control server.")
+      if (error) Log.error("Unreachable Census Control server.")
     })
   }
 
@@ -41,7 +40,7 @@ object OutReports extends WebService {
       "error" -> error
     )
     post("/census/error", data, { (response, error) => 
-      if (error) println(s"${DateTime.now} - WARNING: Unreachable Census Control server.")
+      if (error) Log.error("Unreachable Census Control server.")
     })
   }
 
@@ -52,17 +51,17 @@ object OutReports extends WebService {
   
     def engineImportFinished (request: EngineImportRequest): Unit = {
       report(request.token)
-      println(s"${DateTime.now} - REPORT: Graph import finished in: ${request.importTime} ms.")
+      Log.info(s"Graph import finished in: ${request.importTime} ms.")
     }
 
     def engineComputeFinished (request: EngineComputeRequest): Unit = {
       report(request.token)
-      println(s"${DateTime.now} - REPORT: Computation with token:${request.token} finished in: ${request.computationTime} ms.")
+      Log.info(s"Computation with token:${request.token} finished in: ${request.computationTime} ms.")
     }
 
     def controlComputeFinished (request: ControlComputeRequest): Unit = {
       report(request.token)
-      println(s"${DateTime.now} - REPORT: Computation with token:${request.token} finished in: ${request.computationTime} ms.")
+      Log.info(s"Computation with token:${request.token} finished in: ${request.computationTime} ms.")
     }
 
   }
@@ -76,24 +75,24 @@ object OutReports extends WebService {
 
     def unreachableNeo4j (request: Request): Unit = {
       error(request.token, "unreachable-neo4j")
-      println(s"${DateTime.now} - ERROR: Unreachable Neo4j server on graph import.")
+      Log.error(s"Unreachable Neo4j server on graph import.")
     }
 
     def importFailed (request: Request): Unit = {
       error(request.token, "import-failed")
-      println(s"${DateTime.now} - ERROR: Graph import failed.") 
+      Log.error(s"Graph import failed.") 
     }
 
     /** Computation error reports: */
 
     def computationFailed (request: Request): Unit = {
       error(request.token, "computation-failed")
-      println(s"${DateTime.now} - ERROR: Computation failed.")
+      Log.error(s"Computation failed.")
     }
 
     def computationNotReady (request: Request): Unit = {
       error(request.token, "missing-graph")
-      println(s"${DateTime.now} - ERROR: Couldn't start computation, the graph was not properly imported.")
+      Log.error(s"Couldn't start computation, the graph was not properly imported.")
     }
 
   }

@@ -6,7 +6,7 @@ package control
 
 import scala.concurrent._
 
-import com.github.nscala_time.time.Imports._ 
+import shared.Log 
 
 import play.api.libs.ws._
 import play.api.libs.json._
@@ -97,7 +97,7 @@ class Instance extends WebService {
     ip = _ip
     host = hostname
     port = conf.census_port
-    println(s"${DateTime.now} - INFO: Will wait for census engine service $host.")
+    Log.info(s"Will wait for census engine service $host.")
     setCommunication(callback)
   }
 
@@ -131,7 +131,7 @@ class Instance extends WebService {
    */
   def failed: Unit = {
     status = InstanceStatus.FAILED
-    println(s"${DateTime.now} - ERROR: Couldn't reach instance with host $host:$port.")
+    Log.error(s"Couldn't reach instance with host $host:$port.")
   }
 
   /**
@@ -156,7 +156,7 @@ class Instance extends WebService {
       if (status == "acknowledged")
         callback()
       else
-        println(s"${DateTime.now} - ERROR: Census Engine response status:$status on graph import, please check for bugs.")
+        Log.error(s"Census Engine response status:$status on graph import, please check for bugs.")
     } recover {
       case _ => failed
     }
@@ -239,7 +239,7 @@ class Instance extends WebService {
    * @param on operation.
    */
   def error (token: String, error: String, on: String) {
-    println(s"${DateTime.now} - ERROR: $error on $on for token: $token.")
+    Log.error(s"$error on $on for token: $token.")
   }
 
 }

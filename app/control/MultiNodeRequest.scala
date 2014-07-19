@@ -4,12 +4,11 @@
 
 package control
 
-import com.github.nscala_time.time.Imports._ 
-
 import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import http.OutReports
+import shared.Log 
 
 /**
  * Trait used for all pair graph algorithms, called by a 
@@ -37,7 +36,7 @@ trait MultiNodeRequest extends EngineRequest with Receiver {
     requester.computationTime = System.currentTimeMillis - creationTime
     OutReports.Report.computationFinished(requester)
     orchestrator.delete { () =>
-      println(s"${DateTime.now} - INFO: All instances deleted.")
+      Log.info("All instances deleted.")
     }
   }
 

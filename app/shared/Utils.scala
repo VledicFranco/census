@@ -4,6 +4,8 @@
 
 package utils 
 
+import shared.Log 
+
 /**
  * Utility functions module.
  */
@@ -17,5 +19,18 @@ object Utils {
   def genUUID: String = {
     java.util.UUID.randomUUID.toString
   }
+
+}
+
+/**
+ * Object to centralize logging.
+ */
+object Log {
+
+  def info (msg: String) = 
+    println(s"${DateTime.now} - INFO: $msg")
+
+  def error (msg: String) = 
+    println(s"${DateTime.now} - ERROR: $msg")
 
 }

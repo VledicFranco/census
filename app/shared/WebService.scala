@@ -37,19 +37,19 @@ trait WebService {
    *
    * @param path to post to.
    * @param data to be posted.
-   * @param callback (Response, Boolean)=>Unit callback with 
-   *                 second parameter 'true' if there was an error.
+   * @param callback (Boolean, Response)=>Unit callback with 
+   *                 first parameter 'true' if there was an error.
    * @return a future that handles the web service response.
    */
-  def post (path: String, data: JsValue, callback: (Response, Boolean)=>Unit): Unit = {
+  def post (path: String, data: JsValue, callback: (Boolean, Response)=>Unit): Unit = {
     var requestHolder = WS.url(s"http://$host:$port$path").withHeaders("Content-Type" -> "application/json")
     if (user != "" && password != "") {
       requestHolder = requestHolder.withAuth(user, password, com.ning.http.client.Realm.AuthScheme.BASIC)
     }
     requestHolder.post(data) map { response =>
-      callback(response, false)
+      callback(false, response)
     } recover { case _ =>
-      callback(null, true)
+      callback(true, null)
     }
   }
 

@@ -9,6 +9,7 @@ import scala.concurrent._
 import com.github.nscala_time.time.Imports._ 
 
 import play.api.libs.ws._
+import play.api.libs.json._
 import play.api.libs.concurrent.Execution.Implicits._
 
 import shared.Neo4j
@@ -72,9 +73,6 @@ class Instance extends WebService {
   /** IP of the server. */
   var ip: String = ""
 
-  /** Queue for the requests. */
-  var queue: Array[Sender] = new Array(conf.ce_max_queue_size)
-
   /** 
    * Initializes the instance by creating a GCE
    * virtual machine.
@@ -83,27 +81,24 @@ class Instance extends WebService {
    *                 instance is ready to receive requests.
    */
   private def initialize (callback: Instance=>Unit): Unit = {
-    GCE.createInstance { (h, i, p) =>
-      ip = i
-      setHost(h, p)
-      println(s"${DateTime.now} - INFO: Will wait for census engine service $host.")
-      setCensusControlCommunication(callback)
-    }
+    GCE.createInstance { (hostname, ip) => initializeWithHost(hostname, ip, callback) }
   }
 
   /**
    * Initializes the instance with a preconfigured
    * Census Engine server.
    *
-   * @param h hostname of the Census Engine server.
-   * @param i ip of the Census Engine server.
+   * @param hostname of the Census Engine server.
+   * @param _ip of the Census Engine server.
    * @param callback function to be executed when the Census Engine
    *                 service is ready to receive requests.
    */
-  private def initializeWithHost (h: String, i: String, callback: Instance=>Unit): Unit = {
-    ip = i
-    setHost(h, conf.census_port)
-    setCensusControlCommunication(callback)
+  private def initializeWithHost (hostname: String, _ip: String, callback: Instance=>Unit): Unit = {
+    ip = _ip
+    host = hostname
+    port = conf.census_port
+    println(s"${DateTime.now} - INFO: Will wait for census engine service $host.")
+    setCommunication(callback)
   }
 
   /**
@@ -113,21 +108,21 @@ class Instance extends WebService {
    *
    * @param callback function to be executed when the bidirectional communication is up.
    */
-  private def setCensusControlCommunication (callback: Instance=>Unit): Unit = {
-    ping map { response =>
-      println(s"${DateTime.now} - INFO: Census engine service $host ready.")
-      post("/control", "{"
-        +s""" "host": "${conf.census_control_host}", """
-        +s""" "port": ${conf.census_port} """
-        + "}"
-      ) map { res => 
+  private def setCommunication (callback: Instance=>Unit): Unit = {
+    ping { success =>
+      if (!success) {
+        Thread.sleep(1000)
+        setCommunication(callback)
+        return 
+      }
+      post("/reports", Json.obj(
+        "host" -> conf.census_control_host,
+        "port" -> conf.census_port
+      ), { (error, response) =>
         status = InstanceStatus.IDLE
         InReports.register(this)
         callback(this) 
-      }
-    } recover { case _ => 
-      Thread.sleep(3000)
-      setCensusControlCommunication(callback)
+      })
     }
   }
 
@@ -147,7 +142,6 @@ class Instance extends WebService {
    * @param callback function to be executed when the graph import is successful.
    */
   def prepareForAlgorithm (algorithm: String, database: Neo4j, callback: ()=>Unit): Unit = {
-    // Import graph.
     post("/graph", "{"
       +s""" "token": "${Utils.genUUID}", """
       +s""" "algorithm": "$algorithm", """

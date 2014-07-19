@@ -37,7 +37,7 @@ object InReports extends Controller {
   def unregister (listener: Instance): Unit = {
     listeners -= listener.ip
   }
-  
+
   /** Route: POST /census/report */ 
   def report = Action(parse.json) { implicit request =>
     val token = (request.body \ "token").as[String]

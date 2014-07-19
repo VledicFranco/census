@@ -43,16 +43,16 @@ object GCE {
   /**
    * Requests the creation of a GCE virtual machine.
    *
-   * @param callback(String, String, Int) function to be executed when the instance is ready.
-   *                 hostname, ip, port
+   * @param callback(String, String) function to be executed when the instance is ready.
+   *                hostname, ip
    */
-  def createInstance (callback: (String, String, Int)=>Unit): Unit = {
+  def createInstance (callback: (String, String)=>Unit): Unit = {
     val instanceName: String = s"census-engine-${Utils.genUUID}" 
     val diskName: String = s"disk-$instanceName"
     createDiskRequest(diskName, { () =>
       createInstanceRequest(instanceName, diskName, { () =>
         getInstanceIp(instanceName, { ip =>
-          callback(instanceName, ip, conf.census_engine_port)
+          callback(instanceName, ip)
         })
       })
     })
@@ -61,11 +61,11 @@ object GCE {
   /**
    * Requests the deletion of a GCE virtual machine.
    *
-   * @param instanceName of the virtual machine to be deleted.
+   * @param host of the virtual machine to be deleted.
    * @param callback function to be executed when the instance is deleted.
    */
-  def deleteInstance (instanceName: String, callback: ()=>Unit): Unit = {
-    deleteInstanceRequest(instanceName, callback)
+  def deleteInstance (host: String, callback: ()=>Unit): Unit = {
+    deleteInstanceRequest(host, callback)
   }
 
   /**

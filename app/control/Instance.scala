@@ -6,23 +6,8 @@ package control
 
 import scala.concurrent._
 
-import shared.Log 
-
-import play.api.libs.ws._
-import play.api.libs.json._
-import play.api.libs.concurrent.Execution.Implicits._
-
-import shared.Neo4j
 import shared.WebService
 import control.http.InReports
-import shared.Utils
-
-/**
- * Enumerator used to set instance's status.
- */
-object InstanceStatus extends Enumeration {
-  val INITIALIZING, IDLE, COMPUTING, FAILED, DELETED = Value
-}
 
 /**
  * Object companion used to create Instance objects.
@@ -31,33 +16,20 @@ object Instance {
 
   /**
    * Constructor that creates a Census Engine instance
-   * from a GCE virtual machine.
+   * from a GCE virtual machine or in the localhost.
    *
    * @param callback function to be executed when the Census Engine
    *                 service is ready to receive requests.
    * @return an Instance object.
    */
-  def apply (callback: Instance=>Unit): Instance = {
-    val instance = new Instance
-    instance.initialize(callback)
-    instance
+  def apply (local: Boolean, onReport: (Instance, String)=>Unit, onError: (Instance, String, String)=>Unit, callback: Instance=>Unit): Unit = {
+    if (local)
+      (new Instance("127.0.0.1", "localhost", conf.census_port, onReport, onError)).setCommunication(callback)
+    else
+      GCE.createInstance { (ip, host) => 
+        (new Instance (ip, host, conf.census_port, onReport, onError)).setCommunication(callback)
+      }
   } 
-
-  /**
-   * Constructor that creates a Census Engine instance
-   * from a preconfigured service.
-   *
-   * @param host name of the Census Engine server.
-   * @param ip of the Census Engine server.
-   * @param callback function to be executed when the Census Engine
-   *                 service is ready to receive requests.
-   * @return an Instance object.
-   */
-  def apply (host: String, ip: String, callback: Instance=>Unit): Instance = {
-    val instance = new Instance
-    instance.initializeWithHost(host, ip, callback)
-    instance
-  }
 
 }
 
@@ -65,41 +37,17 @@ object Instance {
  * Class with all the necessary functions to create and communicate with a
  * Census Engine server.
  */
-class Instance extends WebService {
+class Instance (
+  val ip: String, 
+  val host: String, 
+  val port: Int, 
+  onReport: (Instance, String)=>Unit, 
+  onError: (Instance, String, String)=>Unit) 
+extends WebService {
 
-  /** Status of the instance. */
-  var status: InstanceStatus.Value = InstanceStatus.INITIALIZING
-
-  /** IP of the server. */
-  var ip: String = ""
-
-  /** 
-   * Initializes the instance by creating a GCE
-   * virtual machine.
-   *
-   * @param callback function to be executed when the Census Engine
-   *                 instance is ready to receive requests.
-   */
-  private def initialize (callback: Instance=>Unit): Unit = {
-    GCE.createInstance { (hostname, ip) => initializeWithHost(hostname, ip, callback) }
-  }
-
-  /**
-   * Initializes the instance with a preconfigured
-   * Census Engine server.
-   *
-   * @param hostname of the Census Engine server.
-   * @param _ip of the Census Engine server.
-   * @param callback function to be executed when the Census Engine
-   *                 service is ready to receive requests.
-   */
-  private def initializeWithHost (hostname: String, _ip: String, callback: Instance=>Unit): Unit = {
-    ip = _ip
-    host = hostname
-    port = conf.census_port
-    Log.info(s"Will wait for census engine service $host.")
-    setCommunication(callback)
-  }
+  /** WebService trait attributes to be defined. */
+  val user = null
+  val password = null
 
   /**
    * Waits for the Census Engine service to be ready, then it registers this
@@ -112,14 +60,13 @@ class Instance extends WebService {
     ping { success =>
       if (!success) {
         Thread.sleep(1000)
-        setCommunication(callback)
-        return 
+        return setCommunication(callback)
       }
       post("/reports", Json.obj(
         "host" -> conf.census_control_host,
         "port" -> conf.census_port
       ), { (error, response) =>
-        status = InstanceStatus.IDLE
+        if (error) return commError("POST: /reports request.")
         InReports.register(this)
         callback(this) 
       })
@@ -127,40 +74,49 @@ class Instance extends WebService {
   }
 
   /**
-   * Called when the actual Census Engine server fails.
+   * Called when the Census Engine server is unreachable.
    */
-  def failed: Unit = {
-    status = InstanceStatus.FAILED
-    Log.error(s"Couldn't reach instance with host $host:$port.")
-  }
+  private def commError (token: String) = 
+    onError(this, token, "communication-lost")
 
   /**
-   * Imports a graph for an algorithm to the actual Census Engine server.
-   *
-   * @param algorithm name to be used for the Census Engine format.
-   * @param database from which the graph will be imported.
-   * @param callback function to be executed when the graph import is successful.
+   * Called by the InReports module when a report arrives
+   * from the Census Engine server. 
+   * 
+   * @param token of the request that is being reported.
    */
-  def prepareForAlgorithm (algorithm: String, database: Neo4j, callback: ()=>Unit): Unit = {
-    post("/graph", "{"
-      +s""" "token": "${Utils.genUUID}", """
-      +s""" "algorithm": "$algorithm", """
-      +s""" "tag": "${database.tag}", """
-      +s""" "host": "${database.host}", """
-      +s""" "port": ${database.port}, """
-      +s""" "user": "${database.user}", """
-      +s""" "password": "${database.password}" """
-      + "}"
-    ) map { response => 
-      val status = (response.json \ "status").as[String] 
-      if (status == "acknowledged")
-        callback()
-      else
-        Log.error(s"Census Engine response status:$status on graph import, please check for bugs.")
-    } recover {
-      case _ => failed
-    }
-  }
+  def report (token: String) = 
+    onReport(this, token)
+
+  /**
+   * Called by the InReports module when an error arrives
+   * from the Census Engine server. 
+   * 
+   * @param token of the request that is being reported.
+   * @param error description.
+   */
+  def error (token: String, error: String) = 
+    onError(this, token, error)
+
+  /**
+   * Sends a graph import request.
+   *
+   * @param request with token and payload.
+   */
+  def import (request: EngineRequest) =
+    post("/engine/import", request.payload, { (error, response) =>
+      if (error) commError(request.token)
+    })
+
+  /**
+   * Sends an algorithm compute request.
+   *
+   * @param request with token and payload.
+   */
+  def compute (request: EngineRequest) =
+    post("/engine/compute", request.payload, { (error, response) =>
+      if (error) commError(request.token)
+    })
 
   /**
    * Deletes this instance by unregistering it from the InReports module
@@ -169,77 +125,14 @@ class Instance extends WebService {
    * @param callback function to be executed when the GCE virtual machine 
    *                 deletion is done.
    */
-  def delete (callback: ()=>Unit): Unit = {
+  def delete (callback: Unit=>Unit): Unit = {
     InReports.unregister(this)
-    GCE.deleteInstance(host, { () => 
-      status = InstanceStatus.DELETED
-      callback()
-    })
-  }
-
-  /**
-   * Checks if the queue has at least one space for a request.
-   *
-   * @return 'true' if it has space.
-   *         'false' if it doesn't.
-   */
-  def hasFreeSpace: Boolean = {
-    for (request <- queue) {
-      if (request == null) return true
-    }
-    return false
-  }
-
-  /**
-   * Adds an EngineRequest with the Sender interface to the 
-   * queue and sends it immediately.
-   *
-   * @param engineRequest that will be added and sent.
-   */
-  def send (engineRequest: Sender): Unit = {
-    for (i <- 0 to (queue.length-1)) {
-      if (queue(i) == null) {
-        queue(i) = engineRequest 
-        engineRequest.send(this)
-        return
-      }
-    }
-  }
-
-  /**
-   * Invoked by the InReports module when a report arrives
-   * from the Census Engine server. Dequeues the request
-   * and calls the complete method of the EngineRequest with
-   * the Sender interface.
-   * 
-   * @param token of the request that is being reported.
-   */
-  def report (token: String): Unit = {
-    for (i <- 0 to (queue.length-1)) {
-      if (queue(i) != null && queue(i).token == token) {
-        queue(i).complete
-        queue(i) = null
-        // If there are pending requests just return
-        // else set to IDLE.
-        for (request <- queue) {
-          if (request != null) return
-        }
-        status = InstanceStatus.IDLE
-        return
-      }
-    }
-  }
-
-  /**
-   * Invoked by the InReports module when an error arrives
-   * from the Census Engine server. 
-   * 
-   * @param token of the request that is being reported.
-   * @param error description.
-   * @param on operation.
-   */
-  def error (token: String, error: String, on: String) {
-    Log.error(s"$error on $on for token: $token.")
+    if (ip != "127.0.0.1")
+      return GCE.deleteInstance(host, { () => 
+        status = InstanceStatus.DELETED
+        callback()
+      })
+    callback()
   }
 
 }

@@ -19,36 +19,28 @@ import engine.GraphCompute
  */
 class EngineComputeRequest (json: JsValue) extends Request {
 
-  /** Algorithm to be executed. */
-  var algorithm: GraphCompute = null
-
-  /** Variables that the algorithm will use for the computation. */
-  var vars: Array[String] = null
-
-  /** The amount of milliseconds that the computation took. */
-  var computationTime: Long = 0
-
-  /**
-   * Json validation.
-   */
-  def validate: Unit = {
+  /** The request uniquer identifier. */
+  val token: String = 
     (json \ "token").asOpt[String] match {
-      case None => errors = errors :+ "'token' field missing."
-      case Some(data) => token = data
+      case None => errors += "'token' field missing."; ""
+      case Some(data) => data
     }
+
+  /** Algorithm to be executed. */
+  val algorithm: GraphCompute =
     (json \ "algorithm").asOpt[String] match {
-      case None => errors = errors :+ "'algorithm' field missing."
+      case None => errors += "'algorithm' field missing."; ""
       case Some(data) => Library(data) match {
-        case None => errors = errors :+ s"No such algorithm '$data'"
-        case Some(algo) => algorithm = algo
+        case None => errors += s"No such algorithm '$data'"; ""
+        case Some(algo) => algo
       }
     }
-    vars = (json \ "vars").as[Array[String]]
-  }
 
-  /**
-   * Request execution.
-   */
-  def body: Unit = future {algorithm.computeStart(this, vars)}
+  /** Variables that the algorithm will use for the computation. */
+  val vars: Array[String] =
+    (json \ "vals").asOpt[Array[String]] match {
+      case None => Array[String]()
+      case Some(data) => data
+    }
 
 }

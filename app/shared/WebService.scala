@@ -17,19 +17,19 @@ import play.api.libs.concurrent.Execution.Implicits._
 trait WebService {
   
   /** Port where the web service is listening. */
-  var port: Int = 80
+  val port: Int
 
   /** Host name where the web service is located. */
-  var host: String = "unset"
+  val host: String
 
   /** User for authenticating requests. */
-  var user: String = ""
+  val user: String
 
   /** Password for authenticating requests. */
-  var password: String = ""
+  var password: String
 
   /** Timeout used for reachability testing. */
-  val timeoutLength: Int = 2000
+  private val timeoutLength: Int = 2000
 
   /**
    * Uses the Play Framework WS api to post something
@@ -43,7 +43,7 @@ trait WebService {
    */
   def post (path: String, data: JsValue, callback: (Boolean, Response)=>Unit): Unit = {
     var requestHolder = WS.url(s"http://$host:$port$path").withHeaders("Content-Type" -> "application/json")
-    if (user != "" && password != "") {
+    if (user != null && password != null) {
       requestHolder = requestHolder.withAuth(user, password, com.ning.http.client.Realm.AuthScheme.BASIC)
     }
     requestHolder.post(data) map { response =>
@@ -63,7 +63,7 @@ trait WebService {
    */
   def ping (callback: Boolean=>Unit): Unit = {
     var requestHolder = WS.url(s"http://$host:$port").withTimeout(2000)
-    if (user != "" && password != "") {
+    if (user != null && password != null) {
       requestHolder = requestHolder.withAuth(user, password, com.ning.http.client.Realm.AuthScheme.BASIC)
     }
     requestHolder.head() map { response => 

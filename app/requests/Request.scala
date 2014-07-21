@@ -4,39 +4,16 @@
 
 package requests
 
+import scala.collection.mutable.List
 import play.api.libs.json._
-
-import shared.Utils
 
 /**
  * An in request to be validated.
  */
 trait Request {
 
-  /** Request flow. */
-  validate
-  execute
-
-  /** A UUID string used to identify the request. */
-  var token: String = Utils.genUUID
-
-  /** Array used to store all the validation errors. */
-  var errors: Array[String] = Array()
-
-  /**
-   * Request execution.
-   */
-  def body: Unit
-
-  /** 
-   * Called to check if the json of the request is valid.
-   */
-  def validate: Unit
-
-  /**
-   * Invoked by the object companions to start the request.
-   */
-  def execute: Unit = if (!hasErrors) body
+  /** Used to store all the validation errors. */
+  var errors = MutableList[String]()
 
   /**
    * Checks if there were any errors on the validation stage.

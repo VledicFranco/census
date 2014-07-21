@@ -19,17 +19,7 @@ trait EngineRequest {
   /** A UUID string used to identify the request. */
   val token: String = Utils.genUUID
 
-  /** 
-   * The request that arrived to Census Control,
-   * responsible of creating this Census Engine
-   * request.
-   */
-  val requester: ControlComputeRequest
-
-  /** State flag that marks if this request was completed. */
-  var completed: Boolean = false
-
-  /** The moment when this request was created. */
-  val creationTime: Long = System.currentTimeMillis
+  /** Json body of the request. */
+  val payload: JsValue
 
 }

@@ -16,6 +16,7 @@ import requests.SetOutReportsRequest
 
 import control.Orchestrator
 import control.Instance
+import http.OutReports
 
 /**
  * Module that handles the Play Framework HTTP main Census Control
@@ -36,40 +37,51 @@ object InRequests extends Controller {
   /** Route: POST /reports */ 
   def reportsservice = Action(parse.json) { implicit request =>
     val req = new SetOutReportsRequest(request.body)
-    if (req.hasErrors)
-      BadRequest(req.errorsToJson)
-    else
-      Ok(Json.obj("status" -> "success"))
+    if (req.hasErrors) 
+      return BadRequest(req.errorsToJson)
+    OutReports.setService(req.host, req.port)
+    Ok(Json.obj("status" -> "success"))
   }
 
   /** Route: POST /control/compute */ 
   def controlcompute = Action(parse.json) { implicit request =>
     val req = new ControlComputeRequest(request.body)
-    if (req.hasErrors)
-      BadRequest(req.errorsToJson)
-    else
-      Ok(Json.obj(
-        "status" -> "acknowledged",
-        "token" -> req.token
-      ))
+    if (req.hasErrors) 
+      return BadRequest(req.errorsToJson)
+    database.ping { success => 
+      if (!success) return OutReports.Error.unreachableNeo4j(this)
+      algorithm.receive
+    } 
+    Ok(Json.obj(
+      "status" -> "acknowledged",
+      "token" -> req.token
+    ))
   }
 
   /** Route: POST /engine/import */ 
   def engineimport = Action(parse.json) { implicit request =>
     val req = EngineImportRequest(request.body)
     if (req.hasErrors)
-      BadRequest(req.errorsToJson)
-    else
-      Ok(Json.obj("status" -> "acknowledged"))
+      return BadRequest(req.errorsToJson)
+    DB.tag = req.tag
+    DB.setDatabase(req.host, req.port, req.user, req.password)
+    DB.ping { success =>  
+      if (!success) return OutReports.Error.unreachableNeo4j(req)
+      if (DB.importedGraphFormat != null) 
+        DB.importedGraphFormat.clear
+      DB.importedGraphFormat = req.graph
+      req.graph.importStart(req)
+    }
+    Ok(Json.obj("status" -> "acknowledged"))
   }
 
   /** Route: POST /engine/compute */ 
   def enginecompute = Action(parse.json) { implicit request =>
-    val r = EngineComputeRequest(request.body)
-    if (r.hasValidationErrors)
-      BadRequest(r.errorsToJson)
-    else
-      Ok(Json.obj("status" -> "acknowledged"))
+    val req = EngineComputeRequest(request.body)
+    if (req.hasValidationErrors)
+      return BadRequest(req.errorsToJson)
+    future { req.algorithm.computeStart(req, req.vars) }
+    Ok(Json.obj("status" -> "acknowledged"))
   }
 
 }

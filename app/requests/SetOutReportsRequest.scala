@@ -6,8 +6,6 @@ package controllers.requests
 
 import play.api.libs.json._
 
-import http.OutReports
-
 /**
  * An in simple request that registers
  * the Census Control server information.
@@ -17,31 +15,18 @@ import http.OutReports
 class SetOutReportsRequest (json: JsValue) extends Request {
 
   /** The Census Control hostname. */
-  var host: String = null
-
-  /** The Census Control port. */
-  var port: Int = 0
-
-  /**
-   * Json validation.
-   */
-  def validate: Unit = {
+  val host: String =
     (json \ "host").asOpt[String] match {
-      case None => errors = errors :+ "'host' field missing."
-      case Some(data) => host = data replaceAll ("http://", "")
+      case None => errors += "'host' field missing."; ""
+      case Some(data) => data replaceAll ("http://", "")
     }
+ 
+  /** The Census Control port. */
+  var port: Int =
     (json \ "port").asOpt[Int] match {
-      case None => errors = errors :+ "'port' field missing."
-      case Some(data) => port = data
+      case None => errors += "'port' field missing."; 0
+      case Some(data) => data
     }
-  }
 
-  /**
-   * Request execution.
-   */
-  def body: Unit = {
-    OutReports.host = host
-    OutReports.port = port
-  }
 
 } 

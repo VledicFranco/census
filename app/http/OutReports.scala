@@ -19,27 +19,36 @@ import shared.Log
  * server by sending http requests to it with the report
  * as json.
  */
-object OutReports extends WebService {
+object OutReports {
+
+  var service = null
+
+  def setService (_host: String, _port: String) = service = new WebService {
+    val host = _host
+    val port = _port
+    val user = null
+    val password = null
+  }
 
   def report (token: String): Unit = {
-    if (host == "unset") return
+    if (service == null) return
     val data = Json.obj(
       "token" -> token,
       "status" -> "success"
     )
-    post("/census/report", data, { (response, error) => 
+    service.post("/census/report", data, { (response, error) => 
       if (error) Log.error("Unreachable Census Control server.")
     })
   }
 
   def error (token: String, error: String): Unit = {
-    if (host == "unset") return
+    if (service == null) return
     val data = Json.obj(
       "token" -> token,
       "status" -> "error",
       "error" -> error
     )
-    post("/census/error", data, { (response, error) => 
+    service.post("/census/error", data, { (response, error) => 
       if (error) Log.error("Unreachable Census Control server.")
     })
   }

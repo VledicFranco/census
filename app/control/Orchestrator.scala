@@ -10,7 +10,7 @@ import scala.concurrent._
 import scala.collection.mutable.Queue
 
 import shared.Neo4j
-import control.requests.ControlComputeRequest
+import requests.ControlComputeRequest
 
 /**
  * Companion object to create Orchestrators.
@@ -26,8 +26,8 @@ object Orchestrator {
    * @param database to be used to import the graph to the Census Engine services.
    * @param callback function to be executed after all the Census Engine services are ready.
    */
-  def apply (size: Int, algorithm: String, database: Neo4j, callback: Orchestrator=>Unit): Orchestrator = {
-    val orchestrator = new Orchestrator(size, algorithm, database)
+  def apply (request: ControlComputeRequest, callback: Orchestrator=>Unit): Orchestrator = {
+    val orchestrator = new Orchestrator(request)
     orchestrator.initialize(callback)
     orchestrator
   }
@@ -41,7 +41,7 @@ object Orchestrator {
  * @param algorithm to format the Census Engine services.
  * @param database to be used to import the graph to the Census Engine services.
  */
-class Orchestrator (val size: Int, val algorithm: String, val database: Neo4j) {
+class Orchestrator (request: ControlComputeRequest) {
 
   /** Used to know if the requests are being processed. */
   private var isRunning: Boolean = false
@@ -50,7 +50,7 @@ class Orchestrator (val size: Int, val algorithm: String, val database: Neo4j) {
   private val pool: Array[Instance] = new Array[Instance](size)
 
   /** Queue for the requests. */
-  private val queue: Queue[Sender] = Queue()
+  private val queue: Queue[EngineRequest] = Queue()
 
   /**
    * Initializes the orchestrator, starts the Census Engine instance
@@ -113,7 +113,7 @@ class Orchestrator (val size: Int, val algorithm: String, val database: Neo4j) {
    *
    * @param request to be enqueued.
    */
-  def enqueue (request: Sender): Unit = {
+  def enqueue (request: RequestSender): Unit = {
     queue += request
     if (!isRunning) {
       isRunning = true

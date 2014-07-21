@@ -43,7 +43,7 @@ object GCE {
    * Requests the creation of a GCE virtual machine.
    *
    * @param callback(String, String) function to be executed when the instance is ready.
-   *                hostname, ip
+   *                   ip   hostname 
    */
   def createInstance (callback: (String, String)=>Unit): Unit = {
     val instanceName: String = s"census-engine-${Utils.genUUID}" 
@@ -51,7 +51,7 @@ object GCE {
     createDiskRequest(diskName, { () =>
       createInstanceRequest(instanceName, diskName, { () =>
         getInstanceIp(instanceName, { ip =>
-          callback(instanceName, ip)
+          callback(ip, instanceName)
         })
       })
     })

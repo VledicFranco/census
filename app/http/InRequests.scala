@@ -4,6 +4,8 @@
 
 package control.http
 
+import scala.concurrent._
+
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
@@ -39,6 +41,7 @@ object InRequests extends Controller {
     val req = new SetOutReportsRequest(request.body)
     if (req.hasErrors) 
       return BadRequest(req.errorsToJson)
+
     OutReports.setService(req.host, req.port)
     Ok(Json.obj("status" -> "success"))
   }
@@ -48,6 +51,7 @@ object InRequests extends Controller {
     val req = new ControlComputeRequest(request.body)
     if (req.hasErrors) 
       return BadRequest(req.errorsToJson)
+
     database.ping { success => 
       if (!success) return OutReports.Error.unreachableNeo4j(this)
       algorithm.receive
@@ -63,6 +67,7 @@ object InRequests extends Controller {
     val req = EngineImportRequest(request.body)
     if (req.hasErrors)
       return BadRequest(req.errorsToJson)
+
     DB.tag = req.tag
     DB.setDatabase(req.host, req.port, req.user, req.password)
     DB.ping { success =>  
@@ -80,7 +85,8 @@ object InRequests extends Controller {
     val req = EngineComputeRequest(request.body)
     if (req.hasValidationErrors)
       return BadRequest(req.errorsToJson)
-    future { req.algorithm.computeStart(req, req.vars) }
+
+    future { req.algorithm.computeStart(req) }
     Ok(Json.obj("status" -> "acknowledged"))
   }
 

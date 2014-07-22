@@ -38,7 +38,7 @@ class EngineComputeRequest (json: JsValue) extends Request {
 
   /** Variables that the algorithm will use for the computation. */
   val vars: Array[String] =
-    (json \ "vals").asOpt[Array[String]] match {
+    (json \ "vars").asOpt[Array[String]] match {
       case None => Array[String]()
       case Some(data) => data
     }

@@ -7,7 +7,8 @@ package control
 import scala.concurrent._
 
 import shared.WebService
-import control.http.InReports
+import shared.Log
+import http.InReports
 
 /**
  * Object companion used to create Instance objects.
@@ -57,6 +58,7 @@ extends WebService {
    * @param callback function to be executed when the bidirectional communication is up.
    */
   private def setCommunication (callback: Instance=>Unit): Unit = {
+    Log.info(s"Waiting for Census Engine service: $host")
     ping { success =>
       if (!success) {
         Thread.sleep(1000)
@@ -127,12 +129,10 @@ extends WebService {
    */
   def delete (callback: Unit=>Unit): Unit = {
     InReports.unregister(this)
-    if (ip != "127.0.0.1")
-      return GCE.deleteInstance(host, { () => 
-        status = InstanceStatus.DELETED
-        callback()
-      })
-    callback()
+    if (ip == "127.0.0.1") 
+      callback()
+    else
+      GCE.deleteInstance(host, callback)
   }
 
 }

@@ -5,21 +5,53 @@
 package control 
 
 import play.api.libs.json._
-import play.api.libs.concurrent.Execution.Implicits._
+import shared.Neo4j
 
-import control.requests.ControlComputeRequest
-import shared.Utils
-
-/**
- * Main trait that abstracts the attributes of a
- * request to a Census Engine instance.
- */
 trait EngineRequest {
+  
+  val token = Utils.genUUID
 
-  /** A UUID string used to identify the request. */
-  val token: String = Utils.genUUID
-
-  /** Json body of the request. */
   val payload: JsValue
+
+}
+
+class ImportRequest (algorithm: String, tag: String, database: Neo4j) extends EngineRequest {
+
+  val payload = 
+    if (database.user == null)  
+      Json.obj(
+        "token" -> token,
+        "algorithm" -> algorithm,
+        "tag" -> tag,
+        "host" -> database.host,
+        "port" -> database.port
+      )
+    else
+      Json.obj(
+        "token" -> token,
+        "algorithm" -> algorithm,
+        "tag" -> tag,
+        "host" -> database.host,
+        "port" -> database.port,
+        "user" -> database.user,
+        "password" -> database.password
+      )
+
+}
+
+class ComputeRequest (algorithm: String, vars: Array[String] = null) extends EngineRequest {
+
+  val payload = 
+    if (vars == null)
+      Json.obj(
+        "token" -> token,
+        "algorithm" -> algorithm
+      )
+    else 
+      Json.obj(
+        "token" -> token,
+        "algorithm" -> algorithm,
+        "vars" -> Json.toJson(vars)
+      )
 
 }

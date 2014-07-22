@@ -33,10 +33,35 @@ class ControlComputeRequest (json: JsValue) extends Request {
       }
     }
 
+  val local: Boolean =
+    (json \ "local").asOpt[Boolean] match {
+      case None => false
+      case Some(data) => data
+    }
+
   /** Size of the orchestration, only used for MultiNodeRequests. */
   val numberOfInstances: Int =
-    (json \ "instances").asOpt[Int] match {
-      case None => 1
+    if (local) 1
+    else
+      (json \ "instances").asOpt[Int] match {
+        case None => 1
+        case Some(data) => data
+      }
+
+  val bulk: String = 
+    (json \ "bulk").asOpt[String] match {
+      case None => "singlet"
+      case Some(data) => data match {
+        case "all-pair" => "all-pair"
+        case "all-sources" => "all-sources"
+        case _ => errors += s"No such bulk type: $data"; ""
+      }
+    }
+
+  /** Variables that the algorithm will use for the computation. */
+  val vars: Array[String] =
+    (json \ "vars").asOpt[Array[String]] match {
+      case None => Array[String]()
       case Some(data) => data
     }
 

@@ -16,12 +16,12 @@ object SSCloseness extends UndirectedGraphImport {
 
   def edge (target: Any) = new Path(target)
 
-  def computeExecute (computationRequest: ComputeRequest, variables: Array[String]): Unit = {
-    computationRequest.stats = graph.execute.toString
+  def computeExecute (computeRequest: ComputeRequest): Unit = {
+    computeRequest.stats = graph.execute.toString
     graph.shutdown
     var n = 0
     var sum = 0
-    val source = variables(0)
+    val source = computeRequest.variables(0)
     vertices.foreach { case (id, vertex) =>
       val v = vertex.asInstanceOf[Location]
       if (v.state.isDefined && id != source) {
@@ -31,8 +31,8 @@ object SSCloseness extends UndirectedGraphImport {
     }
     val closeness = sum/(n).toDouble
     Neo4j.query(s"MATCH (n {id:'$source'}) SET n.closeness=$closeness", { (response, error) =>
-      if (error) return computeFinish(computationRequest, false)
-      computeFinish(computationRequest, true)
+      if (error) return computeFinish(computeRequest, false)
+      computeFinish(computeRequest, true)
     })
   }
 

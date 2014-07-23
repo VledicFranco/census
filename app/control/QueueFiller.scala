@@ -6,12 +6,14 @@ package control
 
 import scala.collection.mutable.Queue
 
+import requests.ControlComputeRequest
+
 trait QueueFiller {
 
   protected val requestsQueue: Queue[EngineRequest]
 
   protected def fillingFinished: Unit
 
-  def fillQueue: Unit
+  def fillQueue (request: ControlComputeRequest): Unit
 
 }

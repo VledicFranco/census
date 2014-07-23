@@ -53,8 +53,12 @@ object InRequests extends Controller {
       return BadRequest(req.errorsToJson)
 
     database.ping { success => 
-      if (!success) return OutReports.Error.unreachableNeo4j(this)
-      algorithm.receive
+      if (!success) return OutReports.Error.unreachableNeo4j(req)
+      match req.bulk {
+        case "singlet" => new Orchestrator(req) with QueueSinglet
+        case "all-sources" => new Orchestrator(req) with QueueAllSources
+        case _ =>
+      }
     } 
     Ok(Json.obj(
       "status" -> "acknowledged",

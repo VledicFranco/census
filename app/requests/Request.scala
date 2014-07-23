@@ -12,6 +12,8 @@ import play.api.libs.json._
  */
 trait Request {
 
+  val token: String
+
   /** Used to store all the validation errors. */
   var errors = MutableList[String]()
 

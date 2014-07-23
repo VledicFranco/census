@@ -10,6 +10,7 @@ import scala.collection.mutable.Queue
 
 import play.api.libs.json._
 
+import http.OutReports
 import requests.ControlComputeRequest
 import shared.Neo4j
 import shared.Utils
@@ -23,6 +24,10 @@ import shared.Log
  * @param database to be used to import the graph to the Census Engine services.
  */
 abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller {
+
+  fillQueue(request)
+
+  private var finished = false
 
   private val importRequest = new ImportRequest(request.algorithm, request.dbTag, request.database)
 
@@ -40,14 +45,23 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
     synchronized {
       if (!requestsQueue.isEmpty)
         instance.compute(requestsQueue.dequeue)
-      else
+      else {
         instance.delete { () => Log.info(s"deleted: ${instance.host}") }
+        finishAndReportBack
+      }
     }
 
   private def instanceError (instance: Instance, token: String, error: String) = {
     Log.error(s"${instance.host} :: $error")
     if (token == importRequest.token) {
       instance.import(importRequest)
+    }
+  }
+
+  private def finishAndReportBack = {
+    if (!finished) {
+      finished = true
+      OutReports.Report.controlComputeFinished(request)
     }
   }
 

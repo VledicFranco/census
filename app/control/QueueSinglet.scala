@@ -9,10 +9,14 @@ import scala.collection.mutable.Queue
 import http.OutReports
 import requests.ControlComputeRequest
 
-trait QueueAllPair extends QueueFiller {
+trait QueueSinglet extends QueueFiller {
 
   protected val requestsQueue = Queue[EngineRequest]() 
 
-  def fillQueue (request: ControlComputeRequest): Unit = {}
+  def fillQueue (request: ControlComputeRequest): Unit = {
+    requestsQueue.enqueue(new ComputeRequest(request.algorithm, request.vars))
+    fillingFinished
+  }
 
 }
+

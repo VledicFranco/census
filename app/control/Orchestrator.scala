@@ -27,38 +27,38 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
 
   fillQueue(request)
 
-  private var finished = false
+  private var finished: Boolean = false
 
-  private val importRequest = new ImportRequest(request.algorithm, request.dbTag, request.database)
+  private val importRequest: ImportRequest = new ImportRequest(request.algorithm, request.dbTag, request.database)
 
-  protected def fillingFinished = createAndInitInstances
+  protected def fillingFinished: Unit = createAndInitInstances
 
-  private def createAndInitInstances = {
+  private def createAndInitInstances: Unit = {
     for (n <- 1 to request.numberOfInstances) {
       Instance(request.local, instanceReport, instanceError, { instance =>
-        instance.import(importRequest)
+        instance.importGraph(importRequest)
       })
     }
   }
 
-  private def instanceReport (instance: Instance, token: String) =
+  private def instanceReport (instance: Instance, token: String): Unit =
     synchronized {
       if (!requestsQueue.isEmpty)
         instance.compute(requestsQueue.dequeue)
       else {
-        instance.delete { () => Log.info(s"deleted: ${instance.host}") }
+        instance.delete { Unit => Log.info(s"deleted: ${instance.host}") }
         finishAndReportBack
       }
     }
 
-  private def instanceError (instance: Instance, token: String, error: String) = {
+  private def instanceError (instance: Instance, token: String, error: String): Unit = {
     Log.error(s"${instance.host} :: $error")
     if (token == importRequest.token) {
-      instance.import(importRequest)
+      instance.importGraph(importRequest)
     }
   }
 
-  private def finishAndReportBack = {
+  private def finishAndReportBack: Unit = {
     if (!finished) {
       finished = true
       OutReports.Report.controlComputeFinished(request)

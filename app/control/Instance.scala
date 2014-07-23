@@ -6,6 +6,8 @@ package control
 
 import scala.concurrent._
 
+import play.api.libs.json._
+
 import shared.WebService
 import shared.Log
 import http.InReports
@@ -47,8 +49,8 @@ class Instance (
 extends WebService {
 
   /** WebService trait attributes to be defined. */
-  val user = null
-  val password = null
+  val user: String = null
+  val password: String = null
 
   /**
    * Waits for the Census Engine service to be ready, then it registers this
@@ -78,7 +80,7 @@ extends WebService {
   /**
    * Called when the Census Engine server is unreachable.
    */
-  private def commError (token: String) = 
+  private def commError (token: String): Unit = 
     onError(this, token, "communication-lost")
 
   /**
@@ -87,7 +89,7 @@ extends WebService {
    * 
    * @param token of the request that is being reported.
    */
-  def report (token: String) = 
+  def report (token: String): Unit = 
     onReport(this, token)
 
   /**
@@ -97,7 +99,7 @@ extends WebService {
    * @param token of the request that is being reported.
    * @param error description.
    */
-  def error (token: String, error: String) = 
+  def error (token: String, error: String): Unit = 
     onError(this, token, error)
 
   /**
@@ -105,7 +107,7 @@ extends WebService {
    *
    * @param request with token and payload.
    */
-  def import (request: EngineRequest) =
+  def importGraph (request: EngineRequest): Unit =
     post("/engine/import", request.payload, { (error, response) =>
       if (error) commError(request.token)
     })
@@ -115,7 +117,7 @@ extends WebService {
    *
    * @param request with token and payload.
    */
-  def compute (request: EngineRequest) =
+  def compute (request: EngineRequest): Unit =
     post("/engine/compute", request.payload, { (error, response) =>
       if (error) commError(request.token)
     })

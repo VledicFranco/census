@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package controllers.requests
+package requests
 
 import scala.concurrent._
 
@@ -26,9 +26,13 @@ class ControlComputeRequest (json: JsValue) extends Request {
   /** Algorithm to be executed. */
   val algorithm: String =
     (json \ "algorithm").asOpt[String] match {
-      case None => errors += "'algorithm' field missing."; ""
-      case Some(data) => Library(data, this) match {
-        case None => errors += s"No such algorithm '$data'"; ""
+      case None => 
+        errors += "'algorithm' field missing."
+        null
+      case Some(data) => Library(data) match {
+        case None => 
+          errors += s"No such algorithm '$data'"
+          null
         case Some(algo) => data
       }
     }
@@ -54,7 +58,9 @@ class ControlComputeRequest (json: JsValue) extends Request {
       case Some(data) => data match {
         case "all-pair" => "all-pair"
         case "all-sources" => "all-sources"
-        case _ => errors += s"No such bulk type: $data"; ""
+        case _ => 
+          errors += s"No such bulk type: $data"
+          null
       }
     }
 
@@ -68,21 +74,27 @@ class ControlComputeRequest (json: JsValue) extends Request {
   /** Tag used for the Neo4j importation. */
   val dbTag: String =
     (json \ "graph" \ "tag").asOpt[String] match {
-      case None => errors += "'tag' field missing."; ""
+      case None => 
+        errors += "'tag' field missing."
+        null
       case Some(data) => data
     }
 
   /** Neo4j database host. */
   private val dbHost: String = 
     (json \ "graph" \ "host").asOpt[String] match {
-      case None => errors += "'host' field missing."; ""
+      case None => 
+        errors += "'host' field missing."
+        null
       case Some(data) => data replaceAll ("http://", "")
     }
 
   /** Neo4j database port. */
   private val dbPort: Int =
     (json \ "graph" \ "port").asOpt[Int] match {
-      case None => errors += "'port' field missing."; ""
+      case None => 
+        errors += "'port' field missing."
+        0
       case Some(data) => data
     }
 

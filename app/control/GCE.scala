@@ -48,8 +48,8 @@ object GCE {
   def createInstance (callback: (String, String)=>Unit): Unit = {
     val instanceName: String = s"census-engine-${Utils.genUUID}" 
     val diskName: String = s"disk-$instanceName"
-    createDiskRequest(diskName, { () =>
-      createInstanceRequest(instanceName, diskName, { () =>
+    createDiskRequest(diskName, { Unit =>
+      createInstanceRequest(instanceName, diskName, { Unit =>
         getInstanceIp(instanceName, { ip =>
           callback(ip, instanceName)
         })
@@ -63,7 +63,7 @@ object GCE {
    * @param host of the virtual machine to be deleted.
    * @param callback function to be executed when the instance is deleted.
    */
-  def deleteInstance (host: String, callback: ()=>Unit): Unit = {
+  def deleteInstance (host: String, callback: Unit=>Unit): Unit = {
     deleteInstanceRequest(host, callback)
   }
 
@@ -73,10 +73,10 @@ object GCE {
    * @param diskName of the disk to be created.
    * @param callback function to be executed when the disk is created.
    */
-  private def createDiskRequest (diskName: String, callback: ()=>Unit): Unit = {  
+  private def createDiskRequest (diskName: String, callback: Unit=>Unit): Unit = {  
     authorizedPost(s"$apiPrefixWithZone/disks", createDiskPayload(diskName), { response =>
       Log.info(s"Creating $diskName.")
-      checkOperation((response.json \ "selfLink").as[String], { () =>
+      checkOperation((response.json \ "selfLink").as[String], { Unit =>
         Log.info(s"$diskName created.")
         callback()
       }) 
@@ -90,10 +90,10 @@ object GCE {
    * @param diskName of the boot disk for the instance.
    * @param callback function to be executed when the request is done.
    */
-  private def createInstanceRequest (instanceName: String, diskName: String, callback: ()=>Unit): Unit = {
+  private def createInstanceRequest (instanceName: String, diskName: String, callback: Unit=>Unit): Unit = {
     authorizedPost(s"$apiPrefixWithZone/instances", createInstancePayload(instanceName, diskName), { response =>
       Log.info(s"Creating $instanceName.")
-      checkOperation((response.json \ "selfLink").as[String], { () =>
+      checkOperation((response.json \ "selfLink").as[String], { Unit =>
         Log.info(s"$instanceName created.")
         callback()
       }) 
@@ -106,10 +106,10 @@ object GCE {
    * @param instanceName of the virtual machine to be deleted.
    * @param callback function to be executed when the request is done.
    */
-  private def deleteInstanceRequest (instanceName: String, callback: ()=>Unit): Unit = {
+  private def deleteInstanceRequest (instanceName: String, callback: Unit=>Unit): Unit = {
     authorizedDelete(s"$apiPrefixWithZone/instances/$instanceName", { response =>
       Log.info(s"Deleting $instanceName.")
-      checkOperation((response.json \ "selfLink").as[String], { () =>
+      checkOperation((response.json \ "selfLink").as[String], { Unit =>
         Log.info(s"$instanceName deleted.")
         callback()
       }) 
@@ -229,7 +229,7 @@ object GCE {
    * @param link of the operation.
    * @param callback function to be executed when the operation is done.
    */
-  private def checkOperation (link: String, callback: ()=>Unit): Unit = {
+  private def checkOperation (link: String, callback: Unit=>Unit): Unit = {
     authorizedGet(link, { response => 
       if ((response.json \ "status").as[String] == "DONE") {
         callback()

@@ -61,7 +61,7 @@
 //      else q=q+", " 
 //    }
 //    reportNodes.clear
-//    Neo4j.query(q, { (response, error) => 
+//    Neo4j.query(q, { (error, response) => 
 //      if (error) println("NEO4J ERROR") 
 //    })
 //  }

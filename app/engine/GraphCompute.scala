@@ -39,14 +39,12 @@ trait GraphCompute {
    * @param variables received for this execution.
    */
   def computeStart (computationRequest: EngineComputeRequest, variables: Array[String]): Unit = {
-    if (!computationReady) {
+    if (!computationReady)
       OutReports.Error.computationNotReady(computationRequest)
-      computationRequest.finish()
-      return
+    else {
+      reset(variables)
+      computeExecute(computationRequest, variables)
     }
-    reset(variables)
-    computationRequest.computationTime = System.currentTimeMillis
-    computeExecute(computationRequest, variables)
   }
 
   /** 
@@ -58,10 +56,10 @@ trait GraphCompute {
    * @param success 'true' if the computation was successful.
    */
   def computeFinish (computationRequest: EngineComputeRequest, success: Boolean): Unit = {
-    computationRequest.computationTime = System.currentTimeMillis - computationRequest.computationTime
-    if (success) OutReports.Report.computationFinished(computationRequest)
-    else OutReports.Error.computationFailed(computationRequest)
-    computationRequest.finish()
+    if (success) 
+      OutReports.Report.engineComputeFinished(computationRequest)
+    else 
+      OutReports.Error.computationFailed(computationRequest)
   }
 
 }

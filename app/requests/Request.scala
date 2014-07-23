@@ -4,7 +4,8 @@
 
 package requests
 
-import scala.collection.mutable.List
+import scala.collection.mutable.MutableList
+
 import play.api.libs.json._
 
 /**

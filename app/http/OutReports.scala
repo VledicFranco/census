@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package controllers
+package http
 
 import scala.concurrent.Future
 
@@ -12,6 +12,7 @@ import requests.Request
 import requests.EngineImportRequest
 import requests.EngineComputeRequest
 import requests.ControlComputeRequest
+import shared.WebService
 import shared.Log
 
 /** 
@@ -21,9 +22,9 @@ import shared.Log
  */
 object OutReports {
 
-  var service = null
+  var service: WebService = null
 
-  def setService (_host: String, _port: String) = service = new WebService {
+  def setService (_host: String, _port: Int) = service = new WebService {
     val host = _host
     val port = _port
     val user = null
@@ -36,7 +37,7 @@ object OutReports {
       "token" -> token,
       "status" -> "success"
     )
-    service.post("/census/report", data, { (response, error) => 
+    service.post("/census/report", data, { (error, response) => 
       if (error) Log.error("Unreachable Census Control server.")
     })
   }
@@ -48,7 +49,7 @@ object OutReports {
       "status" -> "error",
       "error" -> error
     )
-    service.post("/census/error", data, { (response, error) => 
+    service.post("/census/error", data, { (error, response) => 
       if (error) Log.error("Unreachable Census Control server.")
     })
   }
@@ -58,19 +59,19 @@ object OutReports {
    */
   object Report {
   
-    def engineImportFinished (request: EngineImportRequest): Unit = {
+    def engineImportFinished (request: Request): Unit = {
       report(request.token)
-      Log.info(s"Graph import finished in: ${request.importTime} ms.")
+      Log.info(s"Graph import finished.")
     }
 
-    def engineComputeFinished (request: EngineComputeRequest): Unit = {
+    def engineComputeFinished (request: Request): Unit = {
       report(request.token)
-      Log.info(s"Computation with token:${request.token} finished in: ${request.computationTime} ms.")
+      Log.info(s"Computation with token:${request.token} finished.")
     }
 
-    def controlComputeFinished (request: ControlComputeRequest): Unit = {
+    def controlComputeFinished (request: Request): Unit = {
       report(request.token)
-      Log.info(s"Computation with token:${request.token} finished in: ${request.computationTime} ms.")
+      Log.info(s"Computation with token:${request.token} finished.")
     }
 
   }

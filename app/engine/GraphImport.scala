@@ -17,7 +17,7 @@ import requests.EngineImportRequest
  * a graph import process.
  */
 trait GraphImport extends GraphCompute {
-  
+
   /** The signal collect graph. */
   var graph: Graph[Any, Any] = null
 
@@ -40,10 +40,7 @@ trait GraphImport extends GraphCompute {
    *
    * @param importRequest for this import.
    */
-  def importStart (importRequest: EngineImportRequest): Unit = {
-    importRequest.importTime = System.currentTimeMillis
-    importExecute(importRequest)
-  }
+  def importStart (importRequest: EngineImportRequest): Unit = importExecute(importRequest)
 
   /**
    * Used when the import finishes. Reports back to Census Control
@@ -53,17 +50,15 @@ trait GraphImport extends GraphCompute {
    * @param success 'true' if the importation was successful.
    */
   def importFinish (importRequest: EngineImportRequest, successful: Boolean): Unit = {
-    importRequest.importTime = System.currentTimeMillis - importRequest.importTime
     if (successful) {
-      OutReports.Report.importFinished(importRequest)
+      OutReports.Report.engineImportFinished(importRequest)
       computationReady = true
     } else {
       OutReports.Error.importFailed(importRequest)
       computationReady = false
     }
-    importRequest.finish()
   }
-  
+
   /**
    * Used to clear the imported graph. (Important for memory management)
    */

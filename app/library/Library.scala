@@ -2,9 +2,11 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package compute
+package library
 
 import compute.library._
+
+import engine.GraphImport
 
 /**
  * All the implemented graph algorithms must be registered in

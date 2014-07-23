@@ -2,7 +2,7 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package controllers
+package shared
 
 import scala.concurrent.Future
 
@@ -26,7 +26,7 @@ trait WebService {
   val user: String
 
   /** Password for authenticating requests. */
-  var password: String
+  val password: String
 
   /** Timeout used for reachability testing. */
   private val timeoutLength: Int = 2000

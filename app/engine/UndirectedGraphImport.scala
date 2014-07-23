@@ -8,7 +8,6 @@ import scala.collection.mutable.ArrayBuffer
 
 import com.signalcollect._
 
-import shared.DB
 import http.OutReports
 import requests.EngineImportRequest
 
@@ -48,7 +47,7 @@ trait UndirectedGraphImport extends GraphImport {
       +s"MATCH (a)--(b:${importRequest.tag}) "
       +s"SET a.$importId=true "
       + "RETURN a.id, b.id")
-    DB.query(batchQuery, { (response, error) =>
+    DB.query(batchQuery, { (error, response) =>
       if (error) {
         clearDatabase(importRequest)
         importFinish(importRequest, false)
@@ -88,8 +87,8 @@ trait UndirectedGraphImport extends GraphImport {
     val clearQuery = (
       s"MATCH (a:${importRequest.tag} {$importId:true}) "
      +s"REMOVE a.$importId")
-    DB.query(clearQuery, { (response, error) =>
-      if (error) OutReports.Error.unreachableDB(importRequest)
+    DB.query(clearQuery, { (error, response) =>
+      if (error) OutReports.Error.unreachableNeo4j(importRequest)
     })
   }
 

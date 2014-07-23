@@ -5,6 +5,7 @@
 package control 
 
 import play.api.libs.json._
+import shared.Utils
 import shared.Neo4j
 
 trait EngineRequest {
@@ -17,7 +18,7 @@ trait EngineRequest {
 
 class ImportRequest (algorithm: String, tag: String, database: Neo4j) extends EngineRequest {
 
-  val payload = 
+  val payload: JsValue = 
     if (database.user == null)  
       Json.obj(
         "token" -> token,
@@ -41,7 +42,7 @@ class ImportRequest (algorithm: String, tag: String, database: Neo4j) extends En
 
 class ComputeRequest (algorithm: String, vars: Array[String] = null) extends EngineRequest {
 
-  val payload = 
+  val payload: JsValue = 
     if (vars == null)
       Json.obj(
         "token" -> token,

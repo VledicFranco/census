@@ -2,9 +2,9 @@
  * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
  */
 
-package utils 
+package shared
 
-import shared.Log 
+import com.github.nscala_time.time.Imports._ 
 
 /**
  * Utility functions module.

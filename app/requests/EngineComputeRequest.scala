@@ -4,8 +4,6 @@
 
 package requests
 
-import scala.concurrent.future
-import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json._
 
 import library.Library
@@ -22,16 +20,22 @@ class EngineComputeRequest (json: JsValue) extends Request {
   /** The request uniquer identifier. */
   val token: String = 
     (json \ "token").asOpt[String] match {
-      case None => errors += "'token' field missing."; ""
+      case None => 
+        errors += "'token' field missing."
+        null
       case Some(data) => data
     }
 
   /** Algorithm to be executed. */
   val algorithm: GraphCompute =
     (json \ "algorithm").asOpt[String] match {
-      case None => errors += "'algorithm' field missing."; ""
+      case None => 
+        errors += "'algorithm' field missing."
+        null
       case Some(data) => Library(data) match {
-        case None => errors += s"No such algorithm '$data'"; ""
+        case None => 
+          errors += s"No such algorithm '$data'"
+          null
         case Some(algo) => algo
       }
     }

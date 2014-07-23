@@ -22,38 +22,50 @@ class EngineImportRequest (json: JsValue) extends Request {
   /** Unique identifier for the request. */
   val token =
     (json \ "token").asOpt[String] match {
-      case None => errors += "'token' field missing."
-      case Some(data) => token = data
+      case None => 
+        errors += "'token' field missing."
+        null
+      case Some(data) => data
     }
 
   /** The algorithm that will format and import the graph. */
   val graph: GraphImport =
     (json \ "algorithm").asOpt[String] match {
-      case None => errors += "'algorithm' field missing."; ""
+      case None => 
+        errors += "'algorithm' field missing."
+        null
       case Some(data) => Library(data) match {
-        case Some(algo) => graph = algo
-        case None => errors += s"No such algorithm '$data'"; ""
+        case None => 
+          errors += s"No such algorithm '$data'"
+          null
+        case Some(algo) => algo
       }
     }
 
   /** Extra cypher to be used for the graph importation. */
   val tag: String = null
     (json \ "tag").asOpt[String] match {
-      case None => errors += "'tag' field missing."; ""
-      case Some(data) => tag = data
+      case None => 
+        errors += "'tag' field missing."
+        null
+      case Some(data) => data
     }
 
   /** The DB server hostname. */
   val host: String = 
     (json \ "host").asOpt[String] match {
-      case None => errors += "'host' field missing."; ""
+      case None => 
+        errors += "'host' field missing."
+        null
       case Some(data) => data
     }
 
   /** The DB server port. */
   val port: Int = 
     (json \ "port").asOpt[Int] match {
-      case None => errors += "'port' field missing."; 0
+      case None => 
+        errors += "'port' field missing."
+        0
       case Some(data) => data
     }
 

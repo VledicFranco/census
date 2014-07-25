@@ -17,21 +17,14 @@ import http.InReports
  */
 object Instance {
 
-  /**
-   * Constructor that creates a Census Engine instance
-   * from a GCE virtual machine or in the localhost.
-   *
-   * @param callback function to be executed when the Census Engine
-   *                 service is ready to receive requests.
-   * @return an Instance object.
-   */
-  def apply (local: Boolean, onReport: (Instance, String)=>Unit, onError: (Instance, String, String)=>Unit, callback: Instance=>Unit): Unit = {
-    if (local)
-      (new Instance("127.0.0.1", "localhost", conf.census_port, onReport, onError)).setCommunication(callback)
-    else
-      GCE.createInstance { (ip, host) => 
-        (new Instance (ip, host, conf.census_port, onReport, onError)).setCommunication(callback)
-      }
+  def apply (ip: String, host: String, port: Int, onReport: (Instance, String)=>Unit, onError: (Instance, String, String)=>Unit, callback: Instance=>Unit): Unit = {
+    (new Instance(ip, host, port, onReport, onError)).setCommunication(callback)
+  } 
+
+  def apply (onReport: (Instance, String)=>Unit, onError: (Instance, String, String)=>Unit, callback: Instance=>Unit): Unit = {
+    GCE.createInstance { (ip, host) => 
+      (new Instance (ip, host, conf.census_port, onReport, onError)).setCommunication(callback)
+    }
   } 
 
 }
@@ -60,7 +53,7 @@ extends WebService {
    * @param callback function to be executed when the bidirectional communication is up.
    */
   private def setCommunication (callback: Instance=>Unit): Unit = {
-    Log.info(s"Waiting for Census Engine service: $host")
+    Log.info(s"Waiting for Census Engine service: $host:$port")
     ping { success =>
       if (!success) {
         Thread.sleep(1000)

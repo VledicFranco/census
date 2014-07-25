@@ -25,23 +25,22 @@ object InReports extends Controller {
    *
    * @param instance that will listen for reports.
    */
-  def register (listener: Instance): Unit = {
+  def register (listener: Instance): Unit =
     listeners += (listener.ip -> listener)
-  }
 
   /**
    * Unregisters an instance from the listeners Map.
    *
    * @param instance that will stop listening for reports.
    */
-  def unregister (listener: Instance): Unit = {
+  def unregister (listener: Instance): Unit =
     listeners -= listener.ip
-  }
 
   /** Route: POST /census/report */ 
   def report = Action(parse.json) { implicit request =>
     val token = (request.body \ "token").as[String]
-    listeners.apply(request.remoteAddress).report(token)
+    println("report: "+request.remoteAddress)
+    listeners(request.remoteAddress).report(token)
     Ok
   }
 
@@ -49,6 +48,7 @@ object InReports extends Controller {
   def error = Action(parse.json) { implicit request =>
     val token = (request.body \ "token").as[String]
     val error = (request.body \ "error").as[String]
+    println("error: "+request.remoteAddress)
     listeners(request.remoteAddress).error(token, error)
     Ok
   }

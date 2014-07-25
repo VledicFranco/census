@@ -36,12 +36,21 @@ object InRequests extends Controller {
 
   /** Route: GET /test */
   def test = Action {
+    import play.api.libs.json._
+    import play.api.libs.ws._
+    import play.api.libs.concurrent.Execution.Implicits._
+    val json = Json.obj("host" -> "localhost", "port" -> 9595)
+//    WS.url("http://localhost:9000/reports").withHeaders("Content-Type" -> "application/json").post(json) map {
+//      response => println(response.status)
+//    } recover { case e: Exception => println(e) }
+    WS.url("http://localhost:9000").withTimeout(2000).head() map { response => println(response.status) }
     Ok("Test init.")
   }
 
   /** Route: POST /reports */ 
   def reportsservice = Action(parse.json) { implicit request =>
     val req = new SetOutReportsRequest(request.body)
+    println(s"will register ${req.host}:${req.port}")
     if (req.hasErrors) 
       BadRequest(req.errorsToJson)
     else {
@@ -75,6 +84,7 @@ object InRequests extends Controller {
   /** Route: POST /engine/import */ 
   def engineimport = Action(parse.json) { implicit request =>
     val req = new EngineImportRequest(request.body)
+    println(s"Did receive request for import with token: ${req.token}")
     if (req.hasErrors)
       BadRequest(req.errorsToJson)
     else {

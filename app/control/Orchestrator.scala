@@ -34,25 +34,30 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
   protected def fillingFinished: Unit = createAndInitInstances
 
   private def createAndInitInstances: Unit = {
-    for (n <- 1 to request.numberOfInstances) {
-      Instance(request.local, instanceReport, instanceError, { instance =>
-        instance.importGraph(importRequest)
-      })
+    if (request.engines.length > 0)
+      for (server <- request.engines)
+        Instance(server._1, server._1, server._2, instanceReport, instanceError, { instance =>
+          instance.importGraph(importRequest)
+        })
+    else
+      for (n <- 1 to request.numberOfInstances) {
+        Instance(instanceReport, instanceError, { instance =>
+          instance.importGraph(importRequest)
+        })
+      }
+  }
+
+  private def instanceReport (instance: Instance, token: String): Unit = synchronized {
+    if (!requestsQueue.isEmpty)
+      instance.compute(requestsQueue.dequeue)
+    else {
+      instance.delete { Unit => Log.info(s"deleted: ${instance.host}") }
+      finishAndReportBack
     }
   }
 
-  private def instanceReport (instance: Instance, token: String): Unit =
-    synchronized {
-      if (!requestsQueue.isEmpty)
-        instance.compute(requestsQueue.dequeue)
-      else {
-        instance.delete { Unit => Log.info(s"deleted: ${instance.host}") }
-        finishAndReportBack
-      }
-    }
-
   private def instanceError (instance: Instance, token: String, error: String): Unit = {
-    Log.error(s"${instance.host} :: $error")
+    Log.error(s"${instance.host} : $token : $error")
     if (token == importRequest.token) {
       instance.importGraph(importRequest)
     }

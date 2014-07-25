@@ -42,15 +42,18 @@ trait WebService {
    * @return a future that handles the web service response.
    */
   def post (path: String, data: JsValue, callback: (Boolean, Response)=>Unit): Unit = {
+    println(s"Will post to http://$host:$port$path")
+    println(data)
     var requestHolder = WS.url(s"http://$host:$port$path").withHeaders("Content-Type" -> "application/json")
     if (user != null && password != null) {
       requestHolder = requestHolder.withAuth(user, password, com.ning.http.client.Realm.AuthScheme.BASIC)
     }
     requestHolder.post(data) map { response =>
-      callback(false, response)
-    } recover { case e: Exception =>
-      callback(true, null)
-    }
+      if (response.status == 200)
+        callback(false, response)
+      else 
+        callback(true, response)
+    } 
   }
 
   /**
@@ -62,15 +65,18 @@ trait WebService {
    * @return a future that handles the web service response.
    */
   def ping (callback: Boolean=>Unit): Unit = {
+    println(s"Will ping to http://$host:$port")
     var requestHolder = WS.url(s"http://$host:$port").withTimeout(2000)
     if (user != null && password != null) {
       requestHolder = requestHolder.withAuth(user, password, com.ning.http.client.Realm.AuthScheme.BASIC)
     }
     requestHolder.head() map { response => 
-      callback(true) 
-    } recover { case e: Exception => 
-      callback(false) 
-    }
+      println(response.status)
+      if (response.status == 200)
+        callback(true) 
+      else
+        callback(false) 
+    } 
   }
 
 }

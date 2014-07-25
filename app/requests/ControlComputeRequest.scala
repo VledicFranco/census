@@ -15,7 +15,6 @@ import shared.Utils
 /**
 {
   "algorithm": "SSCloseness",
-  "local": true,
   "instances": 1,
   "bulk": "singlet",
   "vars": ["sourceid"],
@@ -57,12 +56,37 @@ class ControlComputeRequest (json: JsValue) extends Request {
 
   /** Size of the orchestration, only used for MultiNodeRequests. */
   val numberOfInstances: Int =
-    if (local) 1
-    else
-      (json \ "instances").asOpt[Int] match {
-        case None => 1
+    (json \ "instances").asOpt[Int] match {
+      case None => 1
+      case Some(data) => data
+    }
+
+  private val customIPs =
+    (json \ "engines" \\ "server-ip") map { obj => 
+      obj.asOpt[String] match {
+        case None => 
+          errors += "'server-host' field must be a String."
+          null
         case Some(data) => data
       }
+    }
+
+  private val customPorts =
+    (json \ "engines" \\ "server-port") map { obj => 
+      obj.asOpt[Int] match {
+        case None =>
+          errors += "'server-port' field must be a Int."
+          0
+        case Some(data) => data
+      }
+    }
+
+  if (customIPs.size > customPorts.size)
+    errors += "Missing ports for engine servers."
+  if (customPorts.size > customIPs.size)
+    errors += "Missing IPs for engine servers."
+
+  val engines = (customIPs zip customPorts)
 
   val bulk: String = 
     (json \ "bulk").asOpt[String] match {

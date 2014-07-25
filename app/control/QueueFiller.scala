@@ -10,7 +10,7 @@ import requests.ControlComputeRequest
 
 trait QueueFiller {
 
-  protected val requestsQueue: Queue[EngineRequest]
+  protected val requestsQueue = Queue[EngineRequest]() 
 
   protected def fillingFinished: Unit
 

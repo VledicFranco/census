@@ -48,7 +48,7 @@ trait WebService {
     }
     requestHolder.post(data) map { response =>
       callback(false, response)
-    } recover { case _ =>
+    } recover { case e: Exception =>
       callback(true, null)
     }
   }
@@ -68,7 +68,7 @@ trait WebService {
     }
     requestHolder.head() map { response => 
       callback(true) 
-    } recover { case _ => 
+    } recover { case e: Exception => 
       callback(false) 
     }
   }

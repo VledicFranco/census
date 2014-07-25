@@ -63,7 +63,6 @@ object InRequests extends Controller {
           req.bulk match {
             case "singlet" => new Orchestrator(req) with QueueSinglet
             case "all-sources" => new Orchestrator(req) with QueueAllSources
-            case _ =>
           }
       } 
       Ok(Json.obj(

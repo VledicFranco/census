@@ -11,9 +11,7 @@ import requests.ControlComputeRequest
 
 trait QueueAllSources extends QueueFiller {
 
-  protected val requestsQueue = Queue[EngineRequest]() 
-
-  private def queryAllIdsWithRelations (request: ControlComputeRequest): Unit = {
+  def fillQueue (request: ControlComputeRequest): Unit = {
     val tag = request.dbTag
     val database = request.database
     database.query(s"MATCH (a:$tag)--(b:$tag) RETURN distinct a.id", { (error, response) =>
@@ -27,7 +25,5 @@ trait QueueAllSources extends QueueFiller {
       }
     })
   }
-
-  def fillQueue (request: ControlComputeRequest): Unit = queryAllIdsWithRelations(request)
 
 }

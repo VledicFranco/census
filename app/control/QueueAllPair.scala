@@ -11,8 +11,6 @@ import requests.ControlComputeRequest
 
 trait QueueAllPair extends QueueFiller {
 
-  protected val requestsQueue = Queue[EngineRequest]() 
-
   def fillQueue (request: ControlComputeRequest): Unit = {}
 
 }

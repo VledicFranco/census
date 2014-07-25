@@ -11,8 +11,6 @@ import requests.ControlComputeRequest
 
 trait QueueSinglet extends QueueFiller {
 
-  protected val requestsQueue = Queue[EngineRequest]() 
-
   def fillQueue (request: ControlComputeRequest): Unit = {
     requestsQueue.enqueue(new ComputeRequest(request.algorithm, request.vars))
     fillingFinished

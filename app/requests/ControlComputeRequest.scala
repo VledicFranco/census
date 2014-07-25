@@ -13,8 +13,20 @@ import shared.Neo4j
 import shared.Utils
 
 /**
- * An in queue request that executes a
- * graph algorithm in the library.
+{
+  "algorithm": "SSCloseness",
+  "local": true,
+  "instances": 1,
+  "bulk": "singlet",
+  "vars": ["sourceid"],
+  "graph": {
+    "tag": "Profile",
+    "host": "http://spribo2.sb01.stations.graphenedb.com/",
+    "port": 24789,
+    "user": "spribo2",
+    "password": "6e0mtjm8OEgoSRpjNhii"
+  }
+}
  *
  * @param json of the request.
  */
@@ -56,8 +68,9 @@ class ControlComputeRequest (json: JsValue) extends Request {
     (json \ "bulk").asOpt[String] match {
       case None => "singlet"
       case Some(data) => data match {
-        case "all-pair" => "all-pair"
-        case "all-sources" => "all-sources"
+        case "singlet" => data
+        case "all-pair" => data
+        case "all-sources" => data
         case _ => 
           errors += s"No such bulk type: $data"
           null
@@ -86,7 +99,7 @@ class ControlComputeRequest (json: JsValue) extends Request {
       case None => 
         errors += "'host' field missing."
         null
-      case Some(data) => data replaceAll ("http://", "")
+      case Some(data) => (data replaceAll ("http://", "")) replaceAll ("/", "")
     }
 
   /** Neo4j database port. */

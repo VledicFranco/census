@@ -64,16 +64,23 @@ extends WebService {
     ping { success =>
       if (!success) {
         Thread.sleep(1000)
-        return setCommunication(callback)
+        setCommunication(callback)
+      } else {
+        val reportsHost = if (ip == "127.0.0.1") "localhost" else conf.census_control_host
+        val json = Json.obj(
+          "host" -> reportsHost,
+          "port" -> conf.census_port
+        )
+        post("/reports", json, { (error, response) =>
+          if (error)
+            commError("POST: /reports request.")
+          else {
+            Log.info(s"$host ready.")
+            InReports.register(this)
+            callback(this) 
+          }
+        })
       }
-      post("/reports", Json.obj(
-        "host" -> conf.census_control_host,
-        "port" -> conf.census_port
-      ), { (error, response) =>
-        if (error) return commError("POST: /reports request.")
-        InReports.register(this)
-        callback(this) 
-      })
     }
   }
 

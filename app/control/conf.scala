@@ -9,7 +9,7 @@ package control
  */
 object conf {
 
-  val project_id: String = ""
+  val project_id: String = "vidtecci-cloud"
 
   val zone: String = "us-central1-a"
 

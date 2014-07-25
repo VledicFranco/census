@@ -84,11 +84,11 @@ object InRequests extends Controller {
   /** Route: POST /engine/import */ 
   def engineimport = Action(parse.json) { implicit request =>
     val req = new EngineImportRequest(request.body)
-    println(s"Did receive request for import with token: ${req.token}")
     if (req.hasErrors)
       BadRequest(req.errorsToJson)
     else {
       DB.tag = req.tag
+      println(DB.tag)
       DB.setDatabase(req.host, req.port, req.user, req.password)
       DB.ping { success =>  
         if (!success) 

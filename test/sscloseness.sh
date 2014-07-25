@@ -4,6 +4,9 @@ curl -X POST -H "Content-Type: application/json" -d '{
   "instances": 1,
   "bulk": "singlet",
   "vars": ["ProfileofeliacervantesCommunity10545"],
+  "engines": [
+    {"server-ip": "127.0.0.1", "server-port": 9000}
+  ],
   "graph": {
     "tag": "Profile",
     "host": "http://spribo2.sb01.stations.graphenedb.com/",

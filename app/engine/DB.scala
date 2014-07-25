@@ -13,7 +13,7 @@ import play.api.libs.ws.Response
  */
 object DB {
 
-  var tag: String = null
+  var tag: String = ""
 
   /** Reference to the current imported graph. */
   var importedGraphFormat: GraphImport = null

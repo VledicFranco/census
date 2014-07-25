@@ -43,7 +43,7 @@ class EngineImportRequest (json: JsValue) extends Request {
     }
 
   /** Extra cypher to be used for the graph importation. */
-  val tag: String = null
+  val tag: String =
     (json \ "tag").asOpt[String] match {
       case None => 
         errors += "'tag' field missing."

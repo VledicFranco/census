@@ -4,6 +4,7 @@
 
 # In requests
 
+HEAD /             http.InRequests.ping
 GET  /             http.InRequests.index
 GET  /test         http.InRequests.test
 POST /reports      http.InRequests.reportsservice
@@ -14,8 +15,8 @@ POST /engine/import   http.InRequests.engineimport
 
 # In reports
 
-POST /censusengine/report http.InReports.report
-POST /censusengine/error  http.InReports.error
+POST /census/report http.InReports.report
+POST /census/error  http.InReports.error
 
 # Static files
 

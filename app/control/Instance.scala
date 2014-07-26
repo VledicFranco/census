@@ -53,13 +53,13 @@ extends WebService {
    * @param callback function to be executed when the bidirectional communication is up.
    */
   private def setCommunication (callback: Instance=>Unit): Unit = {
-    Log.info(s"Waiting for Census Engine service: $host:$port")
+    Log.info(s"STARTING: $host")
     ping { success =>
       if (!success) {
         Thread.sleep(1000)
         setCommunication(callback)
       } else {
-        val reportsHost = if (ip == "127.0.0.1") "localhost" else conf.census_control_host
+        val reportsHost = if (ip == "127.0.0.1") ip else conf.census_control_host
         val json = Json.obj(
           "host" -> reportsHost,
           "port" -> conf.census_port
@@ -68,7 +68,7 @@ extends WebService {
           if (error)
             commError("POST: /reports request.")
           else {
-            Log.info(s"$host ready.")
+            Log.info(s"READY: $host")
             InReports.register(this)
             callback(this) 
           }

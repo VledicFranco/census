@@ -29,6 +29,11 @@ import engine.DB
  */
 object InRequests extends Controller {
 
+  /** Route: HEAD / */
+  def ping = Action {
+    Ok
+  }
+
   /** Route: GET / */ 
   def index = Action {
     Ok("Hello I am Census, how can I serve you?")
@@ -36,21 +41,12 @@ object InRequests extends Controller {
 
   /** Route: GET /test */
   def test = Action {
-    import play.api.libs.json._
-    import play.api.libs.ws._
-    import play.api.libs.concurrent.Execution.Implicits._
-    val json = Json.obj("host" -> "localhost", "port" -> 9595)
-//    WS.url("http://localhost:9000/reports").withHeaders("Content-Type" -> "application/json").post(json) map {
-//      response => println(response.status)
-//    } recover { case e: Exception => println(e) }
-    WS.url("http://localhost:9000").withTimeout(2000).head() map { response => println(response.status) }
     Ok("Test init.")
   }
 
   /** Route: POST /reports */ 
   def reportsservice = Action(parse.json) { implicit request =>
     val req = new SetOutReportsRequest(request.body)
-    println(s"will register ${req.host}:${req.port}")
     if (req.hasErrors) 
       BadRequest(req.errorsToJson)
     else {
@@ -88,7 +84,6 @@ object InRequests extends Controller {
       BadRequest(req.errorsToJson)
     else {
       DB.tag = req.tag
-      println(DB.tag)
       DB.setDatabase(req.host, req.port, req.user, req.password)
       DB.ping { success =>  
         if (!success) 

@@ -21,6 +21,6 @@ object conf {
 
   val census_control_host: String = "census-control"
 
-  val census_port: Int = 9595
+  val census_port: Int = 9000
 
 }

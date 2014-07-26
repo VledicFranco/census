@@ -33,10 +33,7 @@ object OutReports {
 
   def report (token: String): Unit = {
     if (service == null) return
-    val data = Json.obj(
-      "token" -> token,
-      "status" -> "success"
-    )
+    val data = Json.obj("token" -> token)
     service.post("/census/report", data, { (error, response) => 
       if (error) Log.error("Unreachable Census Control server.")
     })
@@ -46,7 +43,6 @@ object OutReports {
     if (service == null) return
     val data = Json.obj(
       "token" -> token,
-      "status" -> "error",
       "error" -> error
     )
     service.post("/census/error", data, { (error, response) => 

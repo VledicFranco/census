@@ -51,7 +51,7 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
     if (!requestsQueue.isEmpty)
       instance.compute(requestsQueue.dequeue)
     else {
-      instance.delete { Unit => Log.info(s"deleted: ${instance.host}") }
+      instance.delete { Unit => Log.info(s"SHUTDOWN: ${instance.host}") }
       finishAndReportBack
     }
   }

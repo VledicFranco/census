@@ -39,8 +39,9 @@ object InReports extends Controller {
   /** Route: POST /census/report */ 
   def report = Action(parse.json) { implicit request =>
     val token = (request.body \ "token").as[String]
-    println("report: "+request.remoteAddress)
-    listeners(request.remoteAddress).report(token)
+    val listener = listeners.getOrElse(request.remoteAddress, null)
+    if (listener != null)
+      listener.report(token)
     Ok
   }
 
@@ -48,8 +49,9 @@ object InReports extends Controller {
   def error = Action(parse.json) { implicit request =>
     val token = (request.body \ "token").as[String]
     val error = (request.body \ "error").as[String]
-    println("error: "+request.remoteAddress)
-    listeners(request.remoteAddress).error(token, error)
+    val listener = listeners.getOrElse(request.remoteAddress, null)
+    if (listener != null)
+      listener.error(token, error)
     Ok
   }
 

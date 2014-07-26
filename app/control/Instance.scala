@@ -98,7 +98,7 @@ extends WebService {
   private def commError (token: String): Unit = 
     onError(this, token, "communication-lost")
 
-  /** Called by the InReports module when an error arrives.
+  /** Called by the [[http.InReports]] module when an error arrives.
     * 
     * @param token of the request that is being reported.
     * @param error description.
@@ -106,7 +106,7 @@ extends WebService {
   def error (token: String, error: String): Unit = 
     onError(this, token, error)
 
-  /** Called by the InReports module when a report arrives
+  /** Called by the [[http.InReports]] module when a report arrives.
     * 
     * @param token of the request that is being reported.
     */

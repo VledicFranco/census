@@ -68,11 +68,11 @@ extends WebService {
     */
   private def setCommunication (callback: Instance=>Unit): Unit = {
     Log.info(s"STARTING: $host")
+    Thread.sleep(1000)
     ping { success =>
-      if (!success) {
-        Thread.sleep(1000)
+      if (!success)
         setCommunication(callback)
-      } else {
+      else {
         val reportsHost = if (ip == "127.0.0.1") ip else conf.census_control_host
         val json = Json.obj(
           "host" -> reportsHost,

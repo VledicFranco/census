@@ -92,6 +92,7 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
     else
       for (n <- 1 to request.numberOfInstances)
         Instance(instanceReport, instanceError, { instance =>
+          Log.debug(s"Will start graph importation for ${instance.host}")
           instance.importGraph(importRequest)
         })
 
@@ -107,6 +108,7 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
     * @param token of the request that is being reported.
     */
   private def instanceReport (instance: Instance, token: String): Unit = synchronized {
+    Log.debug(s"Instance ${instance.host} finished request $token")
     if (!requestsQueue.isEmpty)
       instance.compute(requestsQueue.dequeue)
     else {
@@ -130,6 +132,7 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
   private def instanceError (instance: Instance, token: String, error: String): Unit = {
     Log.error(s"${instance.host} $error")
     if (token == importRequest.token) {
+      Log.debug(s"Will retry importation for instance ${instance.host}")
       instance.importGraph(importRequest)
     }
   }

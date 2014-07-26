@@ -12,29 +12,52 @@ import library.Library
 import shared.Neo4j
 import shared.Utils
 
-/**
+/** Verifies and encapsulates all the parameters of a computation request to Census Control.
+  *
+  * A json example with all possible parameters. (note that some parameters may override others):
+  {{{
 {
   "algorithm": "SSCloseness",
   "instances": 1,
   "bulk": "singlet",
   "vars": ["sourceid"],
+  "engines": [
+    {"server-ip": "10.124.23.1",
+     "server-port": 9000},
+    {"server-ip": "10.124.23.2",
+     "server-port": 9000}
+  ]
   "graph": {
-    "tag": "Profile",
-    "host": "http://spribo2.sb01.stations.graphenedb.com/",
+    "tag": "Person",
+    "host": "http://test.graphenedb.com/",
     "port": 24789,
-    "user": "spribo2",
-    "password": "6e0mtjm8OEgoSRpjNhii"
+    "user": "root",
+    "password": "admin"
   }
 }
- *
- * @param json of the request.
- */
+  }}}
+  * And here the public data structure attributes that has the request:
+  {{{
+class ControlComputeRequest {
+  val token: String
+  val algorithm: String
+  val numberOfInstances: Int
+  val engines: List[Tuple2[String, Int]]
+  val vars: Array[String]
+  val dbTag: String
+  val database: Neo4j
+}
+  }}}
+  *
+  * @constructor creates a data structure with all the request's parameters.
+  * @param json of the request.
+  */
 class ControlComputeRequest (json: JsValue) extends Request {
 
   /** A unique identifier for this request. */
   val token: String = Utils.genUUID
 
-  /** Algorithm to be executed. */
+  /** Algorithm name to be executed. */
   val algorithm: String =
     (json \ "algorithm").asOpt[String] match {
       case None => 
@@ -48,13 +71,14 @@ class ControlComputeRequest (json: JsValue) extends Request {
       }
     }
 
-  /** Size of the orchestration, only used for MultiNodeRequests. */
+  /** Amount of GCE instances to be created, (Custom Census Engine servers have priority). */
   val numberOfInstances: Int =
     (json \ "instances").asOpt[Int] match {
       case None => 1
       case Some(data) => data
     }
 
+  /** IPs of the custom Census Engine servers. */
   private val customIPs =
     (json \ "engines" \\ "server-ip") map { obj => 
       obj.asOpt[String] match {
@@ -65,6 +89,7 @@ class ControlComputeRequest (json: JsValue) extends Request {
       }
     }
 
+  /** Ports of the custom Census Engine servers. */
   private val customPorts =
     (json \ "engines" \\ "server-port") map { obj => 
       obj.asOpt[Int] match {
@@ -80,8 +105,17 @@ class ControlComputeRequest (json: JsValue) extends Request {
   if (customPorts.size > customIPs.size)
     errors += "Missing IPs for engine servers."
 
+  /** Zip of the customIPs and customPosts. */
   val engines = (customIPs zip customPorts)
 
+  /** The user can decide for which nodes to compute the algorithm.
+    *
+    * That is set in this parameter, for example:
+    *
+    * singlet: to compute for only 1 node.
+    * all-sources: to compute for every node.
+    * all-pairs: to compute for every couple of nodes.
+    */
   val bulk: String = 
     (json \ "bulk").asOpt[String] match {
       case None => "singlet"

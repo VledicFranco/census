@@ -9,12 +9,28 @@ import play.api.libs.json._
 import library.Library
 import engine.Graph
 
-/**
- * An in queue request that executes a
- * graph algorithm in the library.
- *
- * @param json of the request.
- */
+/** Verifies and encapsulates all the parameters of a computation request to a Census Engine instance.
+  *
+  * A json example with all possible parameters:
+  {{{
+{
+  "token": "asdw-12d24-awdqsr1-qwed2",
+  "algorithm": "SSCloseness",
+  "vars": ["sourceid"]
+}
+  }}}
+  * And here the public data structure attributes that has the request:
+  {{{
+class ControlComputeRequest {
+  val token: String
+  val algorithm: Graph
+  val vars: Array[String]
+}
+  }}}
+  *
+  * @constructor creates a data structure with all the request's parameters.
+  * @param json of the request.
+  */
 class EngineComputeRequest (json: JsValue) extends Request {
 
   /** The request uniquer identifier. */

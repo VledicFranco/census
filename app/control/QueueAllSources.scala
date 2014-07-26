@@ -19,11 +19,9 @@ trait QueueAllSources extends QueueFiller {
         OutReports.Error.unreachableNeo4j(request)
       else {
         val data = (response.json \ "data").as[Array[Array[String]]]
-        if (!data.isEmpty) {
-          for (source <- data)
-            requestsQueue.enqueue(new ComputeRequest(request.algorithm, Array(source(0))))
-          fillingFinished
-        }
+        for (source <- data)
+          requestsQueue.enqueue(new ComputeRequest(request.algorithm, Array(source(0))))
+        fillingFinished
       }
     })
   }

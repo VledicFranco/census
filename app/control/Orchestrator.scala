@@ -25,21 +25,23 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
 
   private val importRequest: ImportRequest = new ImportRequest(request.algorithm, request.dbTag, request.database)
 
-  protected def fillingFinished: Unit = createAndInitInstances
+  protected def fillingFinished: Unit =
+    if (requestsQueue.isEmpty)
+      OutReports.Error.emptyNeo4j(request)
+    else
+      createAndInitInstances
 
-  private def createAndInitInstances: Unit = {
+  private def createAndInitInstances: Unit =
     if (request.engines.length > 0)
       for (server <- request.engines)
         Instance(server._1, server._1, server._2, instanceReport, instanceError, { instance =>
           instance.importGraph(importRequest)
         })
     else
-      for (n <- 1 to request.numberOfInstances) {
+      for (n <- 1 to request.numberOfInstances)
         Instance(instanceReport, instanceError, { instance =>
           instance.importGraph(importRequest)
         })
-      }
-  }
 
   private def instanceReport (instance: Instance, token: String): Unit = synchronized {
     if (!requestsQueue.isEmpty)
@@ -57,11 +59,10 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
     }
   }
 
-  private def finishAndReportBack: Unit = {
+  private def finishAndReportBack: Unit =
     if (!finished) {
       finished = true
       OutReports.Report.controlComputeFinished(request)
     }
-  }
 
 }

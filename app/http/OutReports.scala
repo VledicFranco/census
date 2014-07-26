@@ -84,6 +84,11 @@ object OutReports {
       Log.error(s"Unreachable Neo4j server on graph import.")
     }
 
+    def emptyNeo4j (request: Request): Unit = {
+      error(request.token, "empty-neo4j")
+      Log.error(s"Empty Neo4j database with provided tag.")
+    }
+
     def importFailed (request: Request): Unit = {
       error(request.token, "import-failed")
       Log.error(s"Graph import failed.") 

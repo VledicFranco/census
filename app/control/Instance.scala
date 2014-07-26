@@ -4,13 +4,11 @@
 
 package control
 
-import scala.concurrent._
-
 import play.api.libs.json._
 
+import http.InReports
 import shared.WebService
 import shared.Log
-import http.InReports
 
 /**
  * Object companion used to create Instance objects.
@@ -84,15 +82,6 @@ extends WebService {
     onError(this, token, "communication-lost")
 
   /**
-   * Called by the InReports module when a report arrives
-   * from the Census Engine server. 
-   * 
-   * @param token of the request that is being reported.
-   */
-  def report (token: String): Unit = 
-    onReport(this, token)
-
-  /**
    * Called by the InReports module when an error arrives
    * from the Census Engine server. 
    * 
@@ -101,6 +90,15 @@ extends WebService {
    */
   def error (token: String, error: String): Unit = 
     onError(this, token, error)
+
+  /**
+   * Called by the InReports module when a report arrives
+   * from the Census Engine server. 
+   * 
+   * @param token of the request that is being reported.
+   */
+  def report (token: String): Unit = 
+    onReport(this, token)
 
   /**
    * Sends a graph import request.

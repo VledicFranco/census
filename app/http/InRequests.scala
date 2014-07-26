@@ -22,12 +22,17 @@ import control.Orchestrator
 import control.Instance
 
 import engine.Database
+import engine.Graph
 
 /**
  * Module that handles the Play Framework HTTP main Census Control
  * requests.
  */
 object InRequests extends Controller {
+
+  
+  /** Reference to the current imported graph. */
+  var currentGraph: Graph = null
 
   /** Route: HEAD / */
   def ping = Action {
@@ -86,10 +91,10 @@ object InRequests extends Controller {
         if (!success) 
           OutReports.Error.unreachableNeo4j(req)
         else {
-          if (Database.importedGraphFormat != null) 
-            Database.importedGraphFormat.clear
-          Database.importedGraphFormat = req.graph
-          req.graph.importStart(req)
+          if (currentGraph != null) 
+            currentGraph.clear
+          currentGraph = req.graph
+          currentGraph.importStart(req)
         }
       }
       Ok

@@ -10,7 +10,12 @@ import play.api.libs.json._
 /**
  * Class that handles the Neo4j http queries.
  */
-class Neo4j (val host: String, val port: Int, val user: String = null, val password: String = null) extends WebService {
+class Neo4j (
+  val host: String, 
+  val port: Int, 
+  val user: String = null, 
+  val password: String = null) 
+extends WebService {
 
   /**
    * Queries through http to the registered Neo4j

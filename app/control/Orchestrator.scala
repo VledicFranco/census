@@ -4,17 +4,11 @@
 
 package control
 
-import scala.concurrent._
-import scala.collection.mutable.Map
-import scala.collection.mutable.Queue
-
 import play.api.libs.json._
 
+import shared.Log
 import http.OutReports
 import requests.ControlComputeRequest
-import shared.Neo4j
-import shared.Utils
-import shared.Log
 
 /**
  * Class that creates and orchestrates a certain amount of Census Engine instances.
@@ -57,7 +51,7 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
   }
 
   private def instanceError (instance: Instance, token: String, error: String): Unit = {
-    Log.error(s"${instance.host} : $token : $error")
+    Log.error(s"${instance.host} $error")
     if (token == importRequest.token) {
       instance.importGraph(importRequest)
     }

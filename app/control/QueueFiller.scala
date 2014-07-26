@@ -12,8 +12,8 @@ trait QueueFiller {
 
   protected val requestsQueue = Queue[EngineRequest]() 
 
-  protected def fillingFinished: Unit
+  protected def fillQueue (request: ControlComputeRequest): Unit
 
-  def fillQueue (request: ControlComputeRequest): Unit
+  protected def fillingFinished: Unit
 
 }

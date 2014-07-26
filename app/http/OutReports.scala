@@ -54,7 +54,7 @@ object OutReports {
    * Success reports.
    */
   object Report {
-  
+
     def engineImportFinished (request: Request): Unit = {
       report(request.token)
       Log.info(s"Graph import finished.")
@@ -76,7 +76,7 @@ object OutReports {
    * Error reports.
    */
   object Error {
-    
+
     /** Graph import error reports: */
 
     def unreachableNeo4j (request: Request): Unit = {

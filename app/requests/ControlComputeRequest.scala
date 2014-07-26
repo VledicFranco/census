@@ -48,12 +48,6 @@ class ControlComputeRequest (json: JsValue) extends Request {
       }
     }
 
-  val local: Boolean =
-    (json \ "local").asOpt[Boolean] match {
-      case None => false
-      case Some(data) => data
-    }
-
   /** Size of the orchestration, only used for MultiNodeRequests. */
   val numberOfInstances: Int =
     (json \ "instances").asOpt[Int] match {
@@ -93,7 +87,6 @@ class ControlComputeRequest (json: JsValue) extends Request {
       case None => "singlet"
       case Some(data) => data match {
         case "singlet" => data
-        case "all-pair" => data
         case "all-sources" => data
         case _ => 
           errors += s"No such bulk type: $data"

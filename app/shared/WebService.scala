@@ -15,7 +15,7 @@ import play.api.libs.concurrent.Execution.Implicits._
  * through http requests.
  */
 trait WebService {
-  
+
   /** Port where the web service is listening. */
   val port: Int
 

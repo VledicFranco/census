@@ -59,7 +59,7 @@ object SSCloseness extends UndirectedGraph {
         case Some(currentShortestPath) => Some(math.min(currentShortestPath, signal))
       }
     }
-    
+
     def reset (variables: Array[String]) = {
       if (vertexId == variables(0)) state = Some(0)
       else state = None
@@ -71,4 +71,5 @@ object SSCloseness extends UndirectedGraph {
       else 0.0
     }
   }
+
 }

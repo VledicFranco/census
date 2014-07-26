@@ -6,7 +6,7 @@ package library
 
 import compute.library._
 
-import engine.GraphImport
+import engine.Graph
 
 /**
  * All the implemented graph algorithms must be registered in
@@ -21,7 +21,7 @@ object Library {
    * @return the object module of the corresponding algorithm.
    *         'None' if there was no matching algorithm.
    */
-  def apply (algorithm: String): Option[GraphImport] = {
+  def apply (algorithm: String): Option[Graph] = {
     algorithm match {
       case "SSCloseness" => Some(SSCloseness)
       //case "PageRank" => Some(PageRank)

@@ -8,11 +8,11 @@
 //
 //import com.signalcollect._
 //
-//import compute.{UndirectedGraphImport, Resettable}
+//import compute.{UndirectedGraph, Resettable}
 //import controllers.{Neo4j, OutReports}
 //import controllers.requests.ComputeRequest
 //
-//object PageRank extends UndirectedGraphImport {
+//object PageRank extends UndirectedGraph {
 //
 //  val reportNodes = ArrayBuffer[PageRankVertex]()
 //

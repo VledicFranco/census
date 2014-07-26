@@ -4,7 +4,7 @@
 
 package engine
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.MutableList
 
 import com.signalcollect._
 
@@ -14,7 +14,7 @@ import requests.EngineImportRequest
 /**
  * Used to import the basic topology of a DB graph.
  */
-trait UndirectedGraphImport extends GraphImport {
+trait UndirectedGraph extends Graph {
 
   /**
    * Creates a new vertex to add it to the vertices
@@ -74,7 +74,7 @@ trait UndirectedGraphImport extends GraphImport {
   def triple (a: Any, b: Any): Unit = {
     vertices.getOrElseUpdate(a, vertex(a))
     vertices.getOrElseUpdate(b, vertex(b))
-    edges.getOrElseUpdate(a, ArrayBuffer[Edge[Any]]()) += edge(b)
+    edges.getOrElseUpdate(a, MutableList[Edge[Any]]()) += edge(b)
   }
 
   /**

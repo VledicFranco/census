@@ -8,7 +8,7 @@ import play.api.libs.json._
 
 import http.OutReports
 import library.Library
-import engine.GraphImport
+import engine.Graph
 import engine.DB
 
 /**
@@ -29,7 +29,7 @@ class EngineImportRequest (json: JsValue) extends Request {
     }
 
   /** The algorithm that will format and import the graph. */
-  val graph: GraphImport =
+  val graph: Graph =
     (json \ "algorithm").asOpt[String] match {
       case None => 
         errors += "'algorithm' field missing."

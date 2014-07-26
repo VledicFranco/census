@@ -7,12 +7,12 @@ package compute.library
 import com.signalcollect._
 
 import requests.EngineComputeRequest
-import engine.UndirectedGraphImport
+import engine.UndirectedGraph
 import engine.Resettable
 import engine.DB
 import http.OutReports
 
-object SSCloseness extends UndirectedGraphImport {
+object SSCloseness extends UndirectedGraph {
 
   def vertex (id: Any) = new Location(id)
 

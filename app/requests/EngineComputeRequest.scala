@@ -7,7 +7,7 @@ package requests
 import play.api.libs.json._
 
 import library.Library
-import engine.GraphCompute
+import engine.Graph
 
 /**
  * An in queue request that executes a
@@ -27,7 +27,7 @@ class EngineComputeRequest (json: JsValue) extends Request {
     }
 
   /** Algorithm to be executed. */
-  val algorithm: GraphCompute =
+  val algorithm: Graph =
     (json \ "algorithm").asOpt[String] match {
       case None => 
         errors += "'algorithm' field missing."

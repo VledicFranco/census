@@ -16,7 +16,7 @@ object DB {
   var tag: String = ""
 
   /** Reference to the current imported graph. */
-  var importedGraphFormat: GraphImport = null
+  var importedGraphFormat: Graph = null
 
   /** Neo4j current database. */
   var database: Neo4j = null

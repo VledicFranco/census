@@ -4,8 +4,8 @@ import play.Project._
 
 object ApplicationBuild extends Build {
 
-  val appName         = "census2-control"
-  val appVersion      = "1.0-SNAPSHOT"
+  val appName         = "census"
+  val appVersion      = "0.2.0"
 
   val appDependencies = Seq(
     // Add your project dependencies here,

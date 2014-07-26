@@ -11,33 +11,27 @@ import com.signalcollect._
 import http.OutReports
 import requests.EngineImportRequest
 
-/**
- * Used to import the basic topology of a Database graph.
- */
+/** Imports the basic topology of a Database graph. */
 trait UndirectedGraph extends Graph {
 
-  /**
-   * Creates a new vertex to add it to the vertices
-   * data structure.
-   *
-   * @param id of the new vertex.
-   * @returns a new vertex.
-   */
+  /** Creates a new vertex to add it to the vertices data structure.
+    *
+    * @param id of the new vertex.
+    * @returns a new vertex.
+    */
   def vertex (id: Any): Vertex[Any, _]
 
-  /**
-   * Creates a new edge to add it to the edges
-   * data structure.
-   *
-   * @param target id which the edge points to.
-   * @returns a new edge.
-   */
+  /** Creates a new edge to add it to the edges data structure.
+    *
+    * @param target id which the edge points to.
+    * @returns a new edge.
+    */
   def edge (target: Any): Edge[Any]
 
-  /** 
-   * Queries Database for a batch of 1000 vertices and it's
-   * relationships.
-   */
+  /** Queries Database for a batch of 1000 vertices and it's relationships.
+    *
+    * @param importRequst containing needed data.
+    */
   def importExecute (importRequest: EngineImportRequest): Unit = {
     val importId = "census"+importRequest.token.split("-").last
     val batchQuery = (
@@ -64,24 +58,22 @@ trait UndirectedGraph extends Graph {
     })
   }
 
-  /**
-   * Adds without repeating two vertices and a relation
-   * between them to the data structures.
-   *
-   * @param a id of the first vertex.
-   * @param b id of the second vertex.
-   */
+  /** Adds without repeating two vertices and a relation
+    * between them to the data structures.
+    *
+    * @param a id of the first vertex.
+    * @param b id of the second vertex.
+    */
   def triple (a: Any, b: Any): Unit = {
     vertices.getOrElseUpdate(a, vertex(a))
     vertices.getOrElseUpdate(b, vertex(b))
     edges.getOrElseUpdate(a, MutableList[Edge[Any]]()) += edge(b)
   }
 
-  /**
-   * Removes the tag on neo4j nodes used for the import.
-   *
-   * @param importRequest used for this import.
-   */
+  /** Removes the mark attribute on neo4j nodes used for the importation.
+    *
+    * @param importRequest used for this import.
+    */
   def clearDatabase (importRequest: EngineImportRequest): Unit = {
     val importId = "census"+importRequest.token.split("-").last
     val clearQuery = (

@@ -9,8 +9,16 @@ import scala.collection.mutable.Queue
 import http.OutReports
 import requests.ControlComputeRequest
 
+/** Fills the queue with every node id which has at least 1
+  * relationship to other node with the same tag.
+  */
 trait QueueAllSources extends QueueFiller {
 
+  /** Queries the database for all the node sources, then it fills the queue,
+    * in the end it calls 'fillingFinished'.
+    *
+    * @param request with all the needed data for the filling.
+    */
   def fillQueue (request: ControlComputeRequest): Unit = {
     val tag = request.dbTag
     val database = request.database

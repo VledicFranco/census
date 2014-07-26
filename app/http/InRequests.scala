@@ -24,13 +24,9 @@ import control.Instance
 import engine.Database
 import engine.Graph
 
-/**
- * Module that handles the Play Framework HTTP main Census Control
- * requests.
- */
+/** Module that handles the Play Framework HTTP main Census Control requests. */
 object InRequests extends Controller {
-
-  
+ 
   /** Reference to the current imported graph. */
   var currentGraph: Graph = null
 

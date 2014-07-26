@@ -16,10 +16,7 @@ import http.OutReports
 import requests.EngineImportRequest
 import requests.EngineComputeRequest
 
-/**
- * This trait has the interfaces and functionality needed for
- * a graph import process.
- */
+/** Functionality needed for a graph import and graph computation processes. */
 trait Graph {
 
   /** Changed to 'true' only if the graph was succesfully imported. */
@@ -34,30 +31,26 @@ trait Graph {
   /** The imported edges map. (Source ID -> Edges) */
   val edges: Map[Any, MutableList[Edge[Any]]] = Map()
 
-  /**
-   * Used to execute the graph import for the algorithm.
-   *
-   * @param importRequest for this import.
-   */
+  /** Executes the graph importation for the algorithm.
+    *
+    * @param importRequest for this import.
+    */
   def importExecute (importRequest: EngineImportRequest): Unit 
 
-  /**
-   * Used by a EngineImportRequest to start the Database graph
-   * importation.
-   *
-   * @param importRequest for this import.
-   */
+  /** Interface that starts the Database graph importation.
+    *
+    * @param importRequest for this import.
+    */
   def importStart (importRequest: EngineImportRequest): Unit = importExecute(importRequest)
 
-  /**
-   * Used when the import finishes. Reports back to Census Control
-   * and sets this algorithm as ready or not ready.
-   *
-   * @param importRequest for this import.
-   * @param success 'true' if the importation was successful.
-   */
-  def importFinish (importRequest: EngineImportRequest, successful: Boolean): Unit = {
-    if (successful) {
+  /** Used when the import finishes. Reports back to Census Control
+    * and sets this algorithm as ready or not ready.
+    *
+    * @param importRequest for this import.
+    * @param success 'true' if the importation was successful.
+    */
+  def importFinish (importRequest: EngineImportRequest, success: Boolean): Unit = {
+    if (success) {
       OutReports.Report.engineImportFinished(importRequest)
       computationReady = true
     } else {
@@ -66,20 +59,18 @@ trait Graph {
     }
   }
 
-  /** 
-   * Runs the algorithm.
-   *
-   * @param computationRequest for this execution.
-   * @param variables received for this execution.
-   */
+  /** Runs the algorithm computation.
+    *
+    * @param computationRequest for this execution.
+    * @param variables received for this execution.
+    */
   def computeExecute (computationRequest: EngineComputeRequest, variables: Array[String]): Unit
 
-  /** 
-   * Used by a EngineComputeRequest to start the algorithm.
-   *
-   * @param computationRequest for this execution.
-   * @param variables received for this execution.
-   */
+  /** Starts the algorithm computation.
+    *
+    * @param computationRequest for this execution.
+    * @param variables received for this execution.
+    */
   def computeStart (computationRequest: EngineComputeRequest, variables: Array[String]): Unit = {
     if (!computationReady)
       OutReports.Error.computationNotReady(computationRequest)
@@ -89,14 +80,12 @@ trait Graph {
     }
   }
 
-  /** 
-   * Invoked when the computation finishes, registers computation time,
-   * and reports success or failure, then lets the next computation in the
-   * queue begin.
-   *
-   * @param computationRequest for this execution.
-   * @param success 'true' if the computation was successful.
-   */
+  /** Invoked when the computation finishes, registers computation time,
+    * and reports success or failure
+    *
+    * @param computationRequest for this execution.
+    * @param success 'true' if the computation was successful.
+    */
   def computeFinish (computationRequest: EngineComputeRequest, success: Boolean): Unit = {
     if (success) 
       OutReports.Report.engineComputeFinished(computationRequest)
@@ -104,19 +93,16 @@ trait Graph {
       OutReports.Error.computationFailed(computationRequest)
   }
 
-  /**
-   * Used to clear the imported graph. (Important for memory management)
-   */
+  /** Clears the imported graph. (Important for memory management) */
   def clear: Unit = {
     vertices.clear
     edges.clear
     computationReady = false
   }
 
-  /**
-   * Used to setup the signalcollect's graph by adding all the 
-   * imported vertices and edges before every computation.
-   */
+  /** Setups the signalcollect's graph by adding all the 
+    * imported vertices and edges before every computation.
+    */
   def reset (variables: Array[String]): Unit = {
     graph = GraphBuilder.build
     vertices.foreach { case (key, vertex) =>

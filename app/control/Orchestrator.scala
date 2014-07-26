@@ -10,13 +10,11 @@ import shared.Log
 import http.OutReports
 import requests.ControlComputeRequest
 
-/**
- * Class that creates and orchestrates a certain amount of Census Engine instances.
- *
- * @param size or amount of instances to be created and orchestrated.
- * @param algorithm to format the Census Engine services.
- * @param database to be used to import the graph to the Census Engine services.
- */
+/** Orchestrator that manages multiple engine requests between instances.
+  *
+  * @constructor creates an orchestrator that manages a queue built from a census control compute request.
+  * @param request with all the orchestration data.
+  */
 abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller {
 
   fillQueue(request)

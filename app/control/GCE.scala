@@ -13,9 +13,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import shared.Utils
 import shared.Log
 
-/**
- * Module that handles the GCE http api.
- */
+/** Module that handles the GCE http api. */
 object GCE {
 
   /** Access token to authorize requests. */
@@ -30,21 +28,16 @@ object GCE {
   /** URL prefix for GCE http api requests with the project's zone. */
   private val apiPrefixWithZone: String = s"$apiPrefix/zones/${conf.zone}"
 
-  /**
-   * Method to test the obtention of an access token.
-   */
-  def verifyToken: Unit = {
+  /** Method to test the obtention of an access token. */
+  def verifyToken: Unit =
     getAccessToken { token =>
       println(token)
     }
-  }
 
-  /**
-   * Requests the creation of a GCE virtual machine.
-   *
-   * @param callback(String, String) function to be executed when the instance is ready.
-   *                   ip   hostname 
-   */
+  /** Requests the creation of a GCE virtual machine.
+    *
+    * @param callback (String, String) (ip, hostname) function to be executed when the instance is ready.
+    */
   def createInstance (callback: (String, String)=>Unit): Unit = {
     val instanceName: String = s"census-engine-${Utils.genUUID}" 
     val diskName: String = s"disk-$instanceName"
@@ -57,23 +50,20 @@ object GCE {
     })
   }
 
-  /**
-   * Requests the deletion of a GCE virtual machine.
-   *
-   * @param host of the virtual machine to be deleted.
-   * @param callback function to be executed when the instance is deleted.
-   */
-  def deleteInstance (host: String, callback: Unit=>Unit): Unit = {
+  /** Requests the deletion of a GCE virtual machine.
+    *
+    * @param host of the virtual machine to be deleted.
+    * @param callback function to be executed when the instance is deleted.
+    */
+  def deleteInstance (host: String, callback: Unit=>Unit): Unit =
     deleteInstanceRequest(host, callback)
-  }
 
-  /**
-   * Requests the creation of a bootable disk for a GCE virtual machine.
-   *
-   * @param diskName of the disk to be created.
-   * @param callback function to be executed when the disk is created.
-   */
-  private def createDiskRequest (diskName: String, callback: Unit=>Unit): Unit = {  
+  /** Requests the creation of a bootable disk for a GCE virtual machine.
+    *
+    * @param diskName of the disk to be created.
+    * @param callback function to be executed when the disk is created.
+    */
+  private def createDiskRequest (diskName: String, callback: Unit=>Unit): Unit =
     authorizedPost(s"$apiPrefixWithZone/disks", createDiskPayload(diskName), { response =>
       Log.info(s"Creating $diskName.")
       checkOperation((response.json \ "selfLink").as[String], { Unit =>
@@ -81,16 +71,14 @@ object GCE {
         callback()
       }) 
     }) 
-  }
 
-  /**
-   * The actual api call to create a GCE virtual machine.
-   *
-   * @param instanceName of the instance to be created.
-   * @param diskName of the boot disk for the instance.
-   * @param callback function to be executed when the request is done.
-   */
-  private def createInstanceRequest (instanceName: String, diskName: String, callback: Unit=>Unit): Unit = {
+  /** The actual api call to create a GCE virtual machine.
+    *
+    * @param instanceName of the instance to be created.
+    * @param diskName of the boot disk for the instance.
+    * @param callback function to be executed when the request is done.
+    */
+  private def createInstanceRequest (instanceName: String, diskName: String, callback: Unit=>Unit): Unit =
     authorizedPost(s"$apiPrefixWithZone/instances", createInstancePayload(instanceName, diskName), { response =>
       Log.info(s"Creating $instanceName.")
       checkOperation((response.json \ "selfLink").as[String], { Unit =>
@@ -98,15 +86,13 @@ object GCE {
         callback()
       }) 
     })
-  }
 
-  /**
-   * Actual api call to delte a GCE virtual machine.
-   *
-   * @param instanceName of the virtual machine to be deleted.
-   * @param callback function to be executed when the request is done.
-   */
-  private def deleteInstanceRequest (instanceName: String, callback: Unit=>Unit): Unit = {
+  /** Actual api call to delte a GCE virtual machine.
+    *
+    * @param instanceName of the virtual machine to be deleted.
+    * @param callback function to be executed when the request is done.
+    */
+  private def deleteInstanceRequest (instanceName: String, callback: Unit=>Unit): Unit =
     authorizedDelete(s"$apiPrefixWithZone/instances/$instanceName", { response =>
       Log.info(s"Deleting $instanceName.")
       checkOperation((response.json \ "selfLink").as[String], { Unit =>
@@ -114,29 +100,25 @@ object GCE {
         callback()
       }) 
     })
-  }
 
-  /**
-   * Obtains the internal network ip of a GCE virtual machine.
-   *
-   * @param instanceName of the desired virtual machine.
-   * @param callback(String) function to be executed when the ip is obtained.
-   *                  ip
-   */
-  private def getInstanceIp (instanceName: String, callback: String=>Unit): Unit = {
+  /** Obtains the internal network ip of a GCE virtual machine.
+    *
+    * @param instanceName of the desired virtual machine.
+    * @param callback (String)(ip) function to be executed when the ip is obtained.
+    */
+  private def getInstanceIp (instanceName: String, callback: String=>Unit): Unit =
     authorizedGet(s"$apiPrefixWithZone/instances/$instanceName", { response =>
       for (ip <- (response.json \ "networkInterfaces" \\ "networkIP")) {
         callback(ip.as[String])
       }     
     })
-  }
 
-  /**
-   * Requests the GCE metadata service for a new api access token
-   * only if the last one is expired or is about to expire.
-   *
-   * @param callback function to be executed when the token is obtained.
-   */
+  /** Requests the GCE metadata service for a new api access token.
+    * 
+    * Only if the last one is expired or is about to expire.
+    *
+    * @param callback function to be executed when the token is obtained.
+    */
   private def getAccessToken (callback: String=>Unit): Unit = {
     if (access_token != null && System.currentTimeMillis < token_expiration) {
       callback(access_token)
@@ -153,13 +135,12 @@ object GCE {
       }
   }
 
-  /**
-   * Makes a HTTP GET method with a GCE api authorization token.
-   *
-   * @param url where the request is going to be sent.
-   * @param callback function to be executed when the request has responded.
-   */
-  private def authorizedGet (url: String, callback: Response=>Unit): Unit = {
+  /** Makes a HTTP GET method with a GCE api authorization token.
+    *
+    * @param url where the request is going to be sent.
+    * @param callback function to be executed when the request has responded.
+    */
+  private def authorizedGet (url: String, callback: Response=>Unit): Unit =
     getAccessToken { token => 
       WS.url(url)
         .withHeaders("Authorization" -> s"OAuth $token")
@@ -170,15 +151,13 @@ object GCE {
         case _ => Log.error("Couldn't reach the Google Compute Engine service.")
       }
     } 
-  }
 
-  /**
-   * Makes a HTTP POST method with a GCE api authorization token.
-   *
-   * @param url where the request is going to be sent.
-   * @param callback function to be executed when the request has responded.
-   */
-  private def authorizedPost (url: String, data: JsValue, callback: Response=>Unit): Unit = {
+  /** Makes a HTTP POST method with a GCE api authorization token.
+    *
+    * @param url where the request is going to be sent.
+    * @param callback function to be executed when the request has responded.
+    */
+  private def authorizedPost (url: String, data: JsValue, callback: Response=>Unit): Unit =
     getAccessToken { token =>
       WS.url(url)
         .withHeaders("Authorization" -> s"OAuth $token", "Content-Type" -> "application/json")
@@ -189,15 +168,13 @@ object GCE {
         case _ => Log.error("Couldn't reach the Google Compute Engine service.")
       }
     }    
-  }
 
-  /**
-   * Makes a HTTP DELETE method with a GCE api authorization token.
-   *
-   * @param url where the request is going to be sent.
-   * @param callback function to be executed when the request has responded.
-   */
-  private def authorizedDelete (url: String, callback: Response=>Unit): Unit = {
+  /** Makes a HTTP DELETE method with a GCE api authorization token.
+    *
+    * @param url where the request is going to be sent.
+    * @param callback function to be executed when the request has responded.
+    */
+  private def authorizedDelete (url: String, callback: Response=>Unit): Unit =
     getAccessToken { token =>
       WS.url(url)
         .withHeaders("Authorization" -> s"OAuth $token", "Content-Type" -> "application/json")
@@ -208,28 +185,24 @@ object GCE {
         case _ => Log.error("Couldn't reach the Google Compute Engine service.")
       }
     }
-  }
 
-  /**
-   * Checks if the response of an authorized request was successful.
-   *
-   * @param url to log if it wasn't successful.
-   * @param response to be checked.
-   */
-  private def validateAuthorizedRequest (url: String, response: Response): Unit = {
+  /** Checks if the response of an authorized request was successful.
+    *
+    * @param url to log if it wasn't successful.
+    * @param response to be checked.
+    */
+  private def validateAuthorizedRequest (url: String, response: Response): Unit =
     if (response.status != 200) {
       Log.error(s"$url response status ${response.status}, printing json:")
       println(response.json)
     }
-  }
 
-  /**
-   * Checks if a GCE api call operation is done.
-   *
-   * @param link of the operation.
-   * @param callback function to be executed when the operation is done.
-   */
-  private def checkOperation (link: String, callback: Unit=>Unit): Unit = {
+  /** Checks if a GCE api call operation is done.
+    *
+    * @param link of the operation.
+    * @param callback function to be executed when the operation is done.
+    */
+  private def checkOperation (link: String, callback: Unit=>Unit): Unit =
     authorizedGet(link, { response => 
       if ((response.json \ "status").as[String] == "DONE") {
         callback()
@@ -238,15 +211,13 @@ object GCE {
         checkOperation(link, callback) 
       }
     })
-  }
 
-  /**
-   * Creates the json necessary to create a GCE virtual machine boot disk.
-   *
-   * @param diskName to be used for the creation.
-   * @return the json for the api request.
-   */
-  private def createDiskPayload (diskName: String): JsValue = {
+  /** Creates the json necessary to create a GCE virtual machine boot disk.
+    *
+    * @param diskName to be used for the creation.
+    * @return the json for the api request.
+    */
+  private def createDiskPayload (diskName: String): JsValue =
     Json.obj(
       "kind" -> "compute#disk",
       "name" -> diskName,
@@ -254,16 +225,14 @@ object GCE {
       "description" -> "Persistent boot disk.",
       "sourceSnapshot" -> s"$apiPrefix/global/snapshots/${conf.census_engine_snapshot}"
     )
-  }
 
-  /**
-   * Creates the json necessary to create a GCE virtual machine.
-   *
-   * @param instanceName to be used for the creation.
-   * @param diskName to be used for the creation.
-   * @return the json for the api request.
-   */
-  private def createInstancePayload (instanceName: String, diskName: String): JsValue = {
+  /** Creates the json necessary to create a GCE virtual machine.
+    *
+    * @param instanceName to be used for the creation.
+    * @param diskName to be used for the creation.
+    * @return the json for the api request.
+    */
+  private def createInstancePayload (instanceName: String, diskName: String): JsValue =
     Json.obj(
       "name" -> instanceName,
       "machineType" -> s"$apiPrefixWithZone/machineTypes/${conf.census_engine_machine_type}",
@@ -302,6 +271,5 @@ object GCE {
         ))
       )
     )
-  }
 
 }

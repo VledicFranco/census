@@ -12,7 +12,7 @@ import http.OutReports
 import requests.EngineImportRequest
 
 /**
- * Used to import the basic topology of a DB graph.
+ * Used to import the basic topology of a Database graph.
  */
 trait UndirectedGraph extends Graph {
 
@@ -35,7 +35,7 @@ trait UndirectedGraph extends Graph {
   def edge (target: Any): Edge[Any]
 
   /** 
-   * Queries DB for a batch of 1000 vertices and it's
+   * Queries Database for a batch of 1000 vertices and it's
    * relationships.
    */
   def importExecute (importRequest: EngineImportRequest): Unit = {
@@ -47,7 +47,7 @@ trait UndirectedGraph extends Graph {
       +s"MATCH (a)--(b:${importRequest.tag}) "
       +s"SET a.$importId=true "
       + "RETURN a.id, b.id")
-    DB.query(batchQuery, { (error, response) =>
+    Database.query(batchQuery, { (error, response) =>
       if (error) {
         clearDatabase(importRequest)
         importFinish(importRequest, false)
@@ -87,7 +87,7 @@ trait UndirectedGraph extends Graph {
     val clearQuery = (
       s"MATCH (a:${importRequest.tag} {$importId:true}) "
      +s"REMOVE a.$importId")
-    DB.query(clearQuery, { (error, response) =>
+    Database.query(clearQuery, { (error, response) =>
       if (error) OutReports.Error.unreachableNeo4j(importRequest)
     })
   }

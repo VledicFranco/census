@@ -42,7 +42,7 @@ trait Graph {
   def importExecute (importRequest: EngineImportRequest): Unit 
 
   /**
-   * Used by a EngineImportRequest to start the DB graph
+   * Used by a EngineImportRequest to start the Database graph
    * importation.
    *
    * @param importRequest for this import.

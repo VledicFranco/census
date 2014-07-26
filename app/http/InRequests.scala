@@ -21,7 +21,7 @@ import control.QueueSinglet
 import control.Orchestrator
 import control.Instance
 
-import engine.DB
+import engine.Database
 
 /**
  * Module that handles the Play Framework HTTP main Census Control
@@ -36,7 +36,7 @@ object InRequests extends Controller {
 
   /** Route: GET / */ 
   def index = Action {
-    Ok("Hello I am Census, how can I serve you?")
+    Ok("Hello I am Census, a graph computation environment, how can I serve you?")
   }
 
   /** Route: GET /test */
@@ -51,7 +51,7 @@ object InRequests extends Controller {
       BadRequest(req.errorsToJson)
     else {
       OutReports.setService(req.host, req.port)
-      Ok(Json.obj("status" -> "success"))
+      Ok
     }
   }
 
@@ -70,10 +70,7 @@ object InRequests extends Controller {
             case "all-sources" => new Orchestrator(req) with QueueAllSources
           }
       } 
-      Ok(Json.obj(
-        "status" -> "acknowledged",
-        "token" -> req.token
-      ))
+      Ok(Json.obj("token" -> req.token))
     }
   }
 
@@ -83,19 +80,19 @@ object InRequests extends Controller {
     if (req.hasErrors)
       BadRequest(req.errorsToJson)
     else {
-      DB.tag = req.tag
-      DB.setDatabase(req.host, req.port, req.user, req.password)
-      DB.ping { success =>  
+      Database.tag = req.tag
+      Database.setDatabase(req.host, req.port, req.user, req.password)
+      Database.ping { success =>  
         if (!success) 
           OutReports.Error.unreachableNeo4j(req)
         else {
-          if (DB.importedGraphFormat != null) 
-            DB.importedGraphFormat.clear
-          DB.importedGraphFormat = req.graph
+          if (Database.importedGraphFormat != null) 
+            Database.importedGraphFormat.clear
+          Database.importedGraphFormat = req.graph
           req.graph.importStart(req)
         }
       }
-      Ok(Json.obj("status" -> "acknowledged"))
+      Ok
     }
   }
 
@@ -106,7 +103,7 @@ object InRequests extends Controller {
       BadRequest(req.errorsToJson)
     else {
       future { req.algorithm.computeStart(req, req.vars) }
-      Ok(Json.obj("status" -> "acknowledged"))
+      Ok
     }
   }
 

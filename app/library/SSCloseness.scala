@@ -9,7 +9,7 @@ import com.signalcollect._
 import requests.EngineComputeRequest
 import engine.UndirectedGraph
 import engine.Resettable
-import engine.DB
+import engine.Database
 import http.OutReports
 
 object SSCloseness extends UndirectedGraph {
@@ -32,7 +32,7 @@ object SSCloseness extends UndirectedGraph {
       }
     }
     val closeness = sum/(n).toDouble
-    DB.query(s"MATCH (n {id:'$source'}) SET n.closeness=$closeness", { (error, response) =>
+    Database.query(s"MATCH (n {id:'$source'}) SET n.closeness=$closeness", { (error, response) =>
       if (error) return computeFinish(computeRequest, false)
       computeFinish(computeRequest, true)
     })

@@ -6,14 +6,12 @@ package requests
 
 import play.api.libs.json._
 
-import http.OutReports
-import library.Library
 import engine.Graph
-import engine.DB
+import library.Library
 
 /**
  * An in queue request that imports a graph
- * from DB with an algorithm format.
+ * from Database with an algorithm format.
  *
  * @param json of the request.
  */
@@ -51,7 +49,7 @@ class EngineImportRequest (json: JsValue) extends Request {
       case Some(data) => data
     }
 
-  /** The DB server hostname. */
+  /** The Database server hostname. */
   val host: String = 
     (json \ "host").asOpt[String] match {
       case None => 
@@ -60,7 +58,7 @@ class EngineImportRequest (json: JsValue) extends Request {
       case Some(data) => data
     }
 
-  /** The DB server port. */
+  /** The Database server port. */
   val port: Int = 
     (json \ "port").asOpt[Int] match {
       case None => 
@@ -69,14 +67,14 @@ class EngineImportRequest (json: JsValue) extends Request {
       case Some(data) => data
     }
 
-  /** The DB server username. */
+  /** The Database server username. */
   val user: String = 
     (json \ "user").asOpt[String] match {
       case None => null
       case Some(data) => data
     }
 
-  /** The DB server password. */
+  /** The Database server password. */
   val password: String = 
     (json \ "password").asOpt[String] match {
       case None => null

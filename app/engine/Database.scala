@@ -11,7 +11,7 @@ import play.api.libs.ws.Response
 /**
  * Neo4j singleton for Census Engine.
  */
-object DB {
+object Database {
 
   var tag: String = ""
 

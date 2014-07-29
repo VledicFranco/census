@@ -134,7 +134,8 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
     if (token == importRequest.token) {
       Log.debug(s"Will retry importation for instance ${instance.host}")
       instance.importGraph(importRequest)
-    }
+    } else
+      instance.compute(requestsQueue.dequeue)
   }
 
   /** Sends a [[http.OutReports.Report.controlComputeFinished]] only when the 'finished' flag is unset. */

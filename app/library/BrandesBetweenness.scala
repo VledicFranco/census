@@ -34,7 +34,6 @@ object BrandesBetweenness extends UndirectedGraph  {
   def edge (target: Any) = new BrandesEdge(target)
 
   def computeExecute (request: EngineComputeRequest, variables: Array[String]): Unit = {
-    println(":P")
     graph.execute(ExecutionConfiguration.withExecutionMode(ExecutionMode.Synchronous))
     graph.shutdown
     // Brandes calculation.
@@ -56,7 +55,9 @@ object BrandesBetweenness extends UndirectedGraph  {
   private def report (request: EngineComputeRequest, ns: List[BrandesVertex]): Unit =
     Database.query(matchStatement(ns) + " " + setStatement(ns), { (error, response) => 
       if (error)
-        OutReports.Error.unreachableNeo4j(request)
+        computeFinish(request, false)
+      else
+        computeFinish(request, true)
     })
 
   private def matchStatement (ns: List[BrandesVertex]): String = 

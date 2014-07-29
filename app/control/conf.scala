@@ -30,4 +30,7 @@ object conf {
   /** Port used for every Census server. */
   val census_port: Int = 9000
 
+  /** Debug logging mode. */
+  val debug: Boolean = true
+
 }

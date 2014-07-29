@@ -45,7 +45,9 @@ trait WebService {
         callback(false, response)
       else 
         callback(true, response)
-    } 
+    } recover { case e: java.net.ConnectException =>
+      callback(true, null)  
+    }
   }
 
   /** Makes a request to the web service with HEAD method and a timeout to test reachability.
@@ -54,16 +56,20 @@ trait WebService {
     *                 'true' if ping was successful.
     */
   def ping (callback: Boolean=>Unit): Unit = {
+    Log.debug(s"Will ping to $host:$port")
     var requestHolder = WS.url(s"http://$host:$port").withTimeout(2000)
     if (user != null && password != null) {
       requestHolder = requestHolder.withAuth(user, password, com.ning.http.client.Realm.AuthScheme.BASIC)
     }
     requestHolder.head() map { response => 
+      Log.debug(s"Ping to $host:$port with response ${response.status}.")
       if (response.status == 200)
         callback(true) 
       else
         callback(false) 
-    } 
+    } recover { case e: java.net.ConnectException =>
+      callback(false)  
+    }
   }
 
 }

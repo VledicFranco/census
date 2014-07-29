@@ -6,6 +6,8 @@ package shared
 
 import com.github.nscala_time.time.Imports._ 
 
+import control.conf
+
 /** Utility functions module. */
 object Utils {
 
@@ -23,11 +25,15 @@ object Utils {
 object Log {
 
   /** Prints a message with the date prepended. */
-  def info (msg: String) = 
+  def info (msg: String): Unit = 
     println(s"${DateTime.now} - INFO: $msg")
 
   /** Prints a message error with the date prepended. */
-  def error (msg: String) = 
+  def error (msg: String): Unit = 
     println(s"${DateTime.now} - ERROR: $msg")
+
+  def debug (msg: String): Unit =
+    if (conf.debug)
+      println(s"${DateTime.now} - DEBUG: $msg")
 
 }

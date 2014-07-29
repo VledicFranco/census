@@ -22,8 +22,8 @@ object Library {
   def apply (algorithm: String): Option[Graph] = {
     algorithm match {
       case "SSCloseness" => Some(SSCloseness)
+      case "BrandesBetweenness" => Some(BrandesBetweenness)
       //case "PageRank" => Some(PageRank)
-      //case "BrandesBetweenness" => Some(BrandesBetweenness)
       case _ => None
     }
   }

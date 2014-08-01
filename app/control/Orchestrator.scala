@@ -30,13 +30,13 @@ import requests.ControlComputeRequest
   *   - ------------------------------------ -       |   - --------------------------------------------------------------- -
   *   | concrete # def fillingFinished: Unit |       |   | concrete # def fillQueue (request: ControlComputeRequest): Unit |
   *   - ------------------------------------ -       |   - --------------------------------------------------------------- -
-  *                                                  | 
+  *                                                  |
   *                                                  |   - --------------------------------------------------------------- -
   *                                                  |___| trait: BQueueFiller                                             |
   *                                                  |   - --------------------------------------------------------------- -
   *                                                  |   | concrete # def fillQueue (request: ControlComputeRequest): Unit |
   *                                                  |   - --------------------------------------------------------------- -
-  *                                                  | 
+  *                                                  |
   *                                                  |   - --------------------------------------------------------------- -
   *                                                  |___| trait: CQueueFiller                                             |
   *                                                      - --------------------------------------------------------------- -
@@ -46,7 +46,7 @@ import requests.ControlComputeRequest
   *  Each queue filler uses 'fillQueue' to fill the queue on its own way, when
   *  finished it must call 'fillingFinished'. The Orchestrator calls 'fillQueue'
   *  in it's constructor and continues his workflow in 'fillingFinished'.
-  *  
+  *
   *  When you want to create an Orchestrator with a QueueFiller you just:
   {{{
       val orchestrator1 = new Orchestrator(request) with AQueueFiller
@@ -68,7 +68,7 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
   private val importRequest: ImportRequest = new ImportRequest(request.algorithm, request.dbTag, request.database)
 
   /** Implementation from [[control.QueueFiller]]. Called after the queue is filled.
-    * 
+    *
     * Sennds an [[http.OutReports.Error.emptyNeo4j]] error if the queue is empty after filling,
     * if not fires the creation of the instances.
     */
@@ -79,7 +79,7 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
       createAndInitInstances
 
   /** Creates all the needed instances depending on the [[requests.ControlComputeRequest]] parameters.
-    * 
+    *
     * If a list of census engines servers werer provided it creates instances based on them.
     * If not it creates instnaces based on Google Compute Engine services.
     */
@@ -98,7 +98,7 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
 
   /** Function passed to every created instance, called when an instance receives a report
     * from the actual instance server.
-    * 
+    *
     * When a Census Engine server finishes a request it uses [[http.OutReports]] to send a http
     * report to this Census Control server through the net, the report arrives at [[http.InReports]]
     * and is passed to the corresponding [[control.Instance]] that is registered in the [[http.InReports]]
@@ -124,7 +124,7 @@ abstract class Orchestrator (request: ControlComputeRequest) extends QueueFiller
     * a http error to this Census Control server through the net, the report arrives at [[http.InReports]]
     * and is passed to the corresponding [[control.Instance]] that is registered in the [[http.InReports]]
     * listeners, then the corresponding [[control.Instance]] calls this function to notify this orchestrator.
-    * 
+    *
     * @param instance that is receiving the error.
     * @param token of the request that failed.
     * @param error type that made the request fail.

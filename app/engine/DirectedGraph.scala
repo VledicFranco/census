@@ -11,8 +11,8 @@ import com.signalcollect._
 import http.OutReports
 import requests.EngineImportRequest
 
-/** Imports the basic topology of a Neo4j graph. */
-trait UndirectedGraph extends Graph {
+/** Imports the basic topology of a directed Neo4j graph. */
+trait DirectedGraph extends Graph {
 
   /** Creates a new vertex to add it to the vertices data structure.
     *
@@ -38,7 +38,7 @@ trait UndirectedGraph extends Graph {
        s"MATCH (a:${importRequest.tag}) "
       +s"WHERE not(has(a.$importId)) "
       + "WITH a LIMIT 1000 "
-      +s"MATCH (a)--(b:${importRequest.tag}) "
+      +s"MATCH (a)-->(b:${importRequest.tag}) "
       +s"SET a.$importId=true "
       + "RETURN a.id, b.id")
     Database.query(batchQuery, { (error, response) =>

@@ -23,6 +23,7 @@ object Library {
     algorithm match {
       case "SSCloseness" => Some(SSCloseness)
       case "BrandesBetweenness" => Some(BrandesBetweenness)
+      case "DirectedSSSP" => Some(DirectedSSSP)
       //case "PageRank" => Some(PageRank)
       case _ => None
     }

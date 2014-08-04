@@ -1,5 +1,5 @@
-Census API for Algorithms
-=========================
+Census API for graph algorithms
+===============================
 
 Census has a very simple API to integrate communication, data and computation
 easily on a new graph algorithm implemented with Signal/Collect. To illustrate

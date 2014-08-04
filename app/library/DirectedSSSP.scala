@@ -1,3 +1,7 @@
+/**
+ * @author Francisco Miguel Arámburo Torres - atfm05@gmail.com
+ */
+
 package library
 
 import com.signalcollect._
@@ -17,12 +21,16 @@ object DirectedSSSP extends DirectedGraph {
   def computeExecute (request: EngineComputeRequest, vars: Array[String]) = {
     graph.execute
     graph.shutdown
-    Database.query(querystring(vars(0)), { (error, response) => 
-      if (error)
-        computeFinish(request, false)
-      else
-        computeFinish(request, true)
-    })
+    val query = querystring(vars(0))
+    if (query == "MATCH CREATE")
+      computeFinish(request, true)
+    else
+      Database.query(querystring(vars(0)), { (error, response) => 
+        if (error)
+          computeFinish(request, false)
+        else
+          computeFinish(request, true)
+      })
   }
 
   private def querystring (source: String): String =

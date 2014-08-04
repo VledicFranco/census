@@ -4,7 +4,7 @@ gcutil addsnapshot census-engine-snapshot --source_disk=census-engine-disk
 
 # Create needed networks and firewalls for Census Control.
 gcutil addnetwork census-framework
-gcutil addfirewall census-framework-default --network=census-framework --allowed="tcp:9595"
+gcutil addfirewall census-framework-default --network=census-framework --allowed="tcp:9000"
 gcutil addfirewall census-framework-ssh --network=census-framework --allowed="tcp:22"
 gcutil addfirewall census-framework-allow-internal --network=census-framework --allowed_ip_sources=10.0.0.0/8 --allowed="tcp:1-65535,udp:1-65535,icmp"
 
